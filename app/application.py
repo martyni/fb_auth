@@ -1,18 +1,13 @@
-from flask import Flask, Response, request, url_for, redirect, jsonify, render_template
-import boto3
+from flask import Flask, Response, request, url_for, redirect, jsonify, render_template, session
+from secrets import FACEBOOK_APP_ID, FACEBOOK_APP_SECRET
 import datetime
-import re
-from requests import get
+from flask_oauth import OAuth
 
 app = Flask(__name__)
-client = boto3.client("s3")
 
-cache = {}
 time_format = "%Y-%M-%d %H:%M:%s"
 author = "Martyn Pratt"
 email = "martynjamespratt@gmail.com"
-s3_link = "https://s3-eu-west-1.amazonaws.com/{}/"
-
 
 def url_sanitizer(raw_path):
     if ".amazonaws.com" not in request.url:
@@ -45,64 +40,66 @@ def time_diff(time_1, time_2):
         time_2 = datetime.datetime.strptime(time_2,  time_format)
     return time_1 - time_2
 
-
-def main(path=""):
-    return {"path": path}
-
-
-def api(path="", error=None, meta={}):
-    error_status_code = 400
-    path = path_sanitizer(path)
-    payload = {
-        "error": error,
-        "path": path,
-        "response": {},
-        "meta": meta
-    }
-    payload["meta"]["date"] = time_dump()
-    payload["meta"]["url"] = url_sanitizer(request.url)
-    payload["meta"]["remote_addr"] = request.remote_addr
-    payload["meta"]["user_agent"] = str(request.user_agent)
-    payload["meta"]["status"] = 200
-    payload["response"] = main(path=path)
-    if payload["response"].get("error"):
-        payload["error"] = payload["response"]["error"]
-    if not payload["response"]:
-        payload["error"] = "Series {} not found".format(path)
-    if not payload["error"]:
-        return jsonify(payload)
-    else:
-        payload["meta"]["status"] = error_status_code
-        response = jsonify(payload)
-        response.status_code = error_status_code
-        return response
-
-@app.route('/test')
-def test():
-    return 'OMG'
+#----------------------------------------
+# facebook authentication
+#----------------------------------------
 
 
-@app.route('/error_test')
-def error_test():
-    return api(path="error_test", error="here is an error")
+app.secret_key = FACEBOOK_APP_SECRET
 
+oauth = OAuth()
 
-@app.route('/')
-def list_files():
-    request_path = url_4("list_files")
-    request_path = request_path + "/" if request_path[-1] != "/" else request_path
-    print request_path
-    return render_template("base.html", request_path=request_path, links={"api_root": url_4("api_root")})
+facebook = oauth.remote_app('facebook',
+    base_url='https://graph.facebook.com/',
+    request_token_url=None,
+    access_token_url='/oauth/access_token',
+    authorize_url='https://www.facebook.com/dialog/oauth',
+    consumer_key=FACEBOOK_APP_ID,
+    consumer_secret=FACEBOOK_APP_SECRET,
+    request_token_params={'scope': ('email, ')}
+)
 
-@app.route('/api')
-def api_root():
-    return api()
+@facebook.tokengetter
+def get_facebook_token():
+    return session.get('facebook_token')
 
+def pop_login_session():
+    session.pop('logged_in', None)
+    session.pop('facebook_token', None)
 
-@app.route('/api/<path>')
-def api_path(path):
-    return api(path=path)
+@app.route("/facebook_login")
+def facebook_login():
+    return facebook.authorize(callback=url_for('facebook_authorized',
+        next=request.args.get('next'), _external=True))
 
+@app.route("/facebook_authorized")
+@facebook.authorized_handler
+def facebook_authorized(resp):
+    next_url = request.args.get('next') or url_for('index')
+    if resp is None or 'access_token' not in resp:
+        return redirect(next_url)
+    session['logged_in'] = True
+    session['facebook_token'] = (resp['access_token'], '')
+
+    return redirect(next_url)
+
+@app.route("/logout")
+def logout():
+    pop_login_session()
+    return redirect(url_for('index'))
+
+@app.route("/")
+def index():
+    user_name = 'null'
+    try:
+       data = facebook.get('/me').data
+       if 'id' in data and 'name' in data:
+           user_id = data['id']
+           user_name = data['name']
+    except:
+       pass
+
+    return render_template("base.html", user_name=user_name)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

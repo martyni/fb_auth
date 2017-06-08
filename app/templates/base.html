@@ -9,31 +9,17 @@
 	</script>
     </head>
     <body>
+        <ul class="nav pull-right">
+            {% if not session.logged_in %}
+                 <li><a href="/facebook_login">Login or Signup</a></li>
+            {% else %}
+                 <li><a href="/logout">{{ user_name }} Logout</a></li>
+            {% endif %}
+        </ul>
+            {% if not session.logged_in %}
+	    {% else %}
 
-    <table id="main" class="table table-striped">
-        {% for slug, url in links.iteritems() %}	    
-             <tr>
-		 <td>
-                    <a href="{{ url }}"> {{ slug }} </a>
-		 </td>
-             </tr>
-        {% endfor %}
-    </table>	    
+	    {% endif%}
     </body>
-    {% for slug, url in links.iteritems() %}
-    <script >
-    function onLoad() { json = $.getJSON('{{ url }}').done( function () {
-       $.each(json.responseJSON.response,  function(item) {
-                        base = "{{ request_path }}";
-			console.log(base);
-			element = '<tr><td><a href="' + base + 'api/' + item.split(" ").join('_') + '">' + item + '</a></td></tr>';
-                        console.log(element);
-			$("#main ").find("tbody").append(element); 
-          }
-       )}
-    )}
-    $(document).ready( onLoad())	
-    </script>
-    {%endfor %}
 </html>
 
