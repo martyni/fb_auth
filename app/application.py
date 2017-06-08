@@ -99,7 +99,7 @@ def index():
     except:
        pass
 
-    return render_template("base.html", user_name=user_name)
+    return render_template("base.html", user_name=user_name, url_4=url_4)
 
 @app.route("/test")
 def test():
