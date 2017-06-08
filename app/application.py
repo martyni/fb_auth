@@ -69,13 +69,13 @@ def pop_login_session():
 
 @app.route("/facebook_login")
 def facebook_login():
-    return facebook.authorize(callback=url_for('facebook_authorized',
+    return facebook.authorize(callback=url_4('facebook_authorized',
         next=request.args.get('next'), _external=True))
 
 @app.route("/facebook_authorized")
 @facebook.authorized_handler
 def facebook_authorized(resp):
-    next_url = request.args.get('next') or url_for('index')
+    next_url = request.args.get('next') or url_4('index')
     if resp is None or 'access_token' not in resp:
         return redirect(next_url)
     session['logged_in'] = True
@@ -86,7 +86,7 @@ def facebook_authorized(resp):
 @app.route("/logout")
 def logout():
     pop_login_session()
-    return redirect(url_for('index'))
+    return redirect(url_4('index'))
 
 @app.route("/")
 def index():
