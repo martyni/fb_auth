@@ -5,7 +5,7 @@
           "parameter_depth": 1,
           "environment_variables": {
                   "env": "dev",
-		  "static_host": "https://s3-eu-west-1.amazonaws.com",
+		  "static_host": "https://s3.eu-west-2.amazonaws.com",
 		  "static_path": "/martyni-static/auth/dev/app/"
           }		  
    },
@@ -15,7 +15,7 @@
           "parameter_depth": 1,
           "environment_variables": {
                   "env": "stge",
-		  "static_host": "https://s3-eu-west-1.amazonaws.com",
+		  "static_host": "https://s3.eu-west-2.amazonaws.com",
 		  "static_path": "/martyni-static/auth/stge/app/"
           }		  
    },
@@ -25,7 +25,7 @@
           "parameter_depth": 1,
           "environment_variables": {
                   "env": "prod",
-		  "static_host": "https://s3-eu-west-1.amazonaws.com",
+		  "static_host": "https://s3.eu-west-2.amazonaws.com",
 		  "static_path": "/martyni-static/auth/prod/app/"
           }		  
    }
