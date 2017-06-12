@@ -1,0 +1,14 @@
+
+@font-face {
+    font-family: header;
+    src: url('/auth/dev/app/static/header.otf');
+}
+
+
+
+h1 {
+    font-family: header;
+    background-color: white;
+    text-align: center;
+    font-size: 5em;
+}

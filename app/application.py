@@ -1,14 +1,19 @@
-from flask import Flask, Response, request, url_for, redirect, jsonify, render_template, session
+from flask import Flask, Response, request, url_for, redirect, jsonify, render_template, session, make_response, request, current_app
 from secrets import FACEBOOK_APP_ID, FACEBOOK_APP_SECRET
-import datetime
+from datetime import timedelta, datetime
+from functools import update_wrapper
 from flask_oauth import OAuth
-
-app = Flask(__name__)
+from os import environ
 
 time_format = "%Y-%M-%d %H:%M:%s"
 author = "Martyn Pratt"
 email = "martynjamespratt@gmail.com"
+if environ.get("env"):
+    static_url = environ.get("static_host") + environ.get("static_path")
+else:
+    static_url = ''
 
+app = Flask(__name__, static_url_path='/static')
 def url_sanitizer(raw_path):
     if ".amazonaws.com" not in request.url:
         return raw_path.replace('/prod', '').replace('/stge', '').replace('/dev', '')
@@ -26,18 +31,18 @@ def url_4(*args, **qwargs):
 
 
 def time_dump():
-    return datetime.datetime.utcnow().strftime(time_format)
+    return datetime.utcnow().strftime(time_format)
 
 
 def time_load(time_string):
-    return datetime.datetime.strptime(time_string, time_format)
+    return datetime.strptime(time_string, time_format)
 
 
 def time_diff(time_1, time_2):
     if type(time_1) == str:
-        time_1 = datetime.datetime.strptime(time_1,  time_format)
+        time_1 = datetime.strptime(time_1,  time_format)
     if type(time_2) == str:
-        time_2 = datetime.datetime.strptime(time_2,  time_format)
+        time_2 = datetime.strptime(time_2,  time_format)
     return time_1 - time_2
 
 #----------------------------------------
@@ -51,6 +56,7 @@ oauth = OAuth()
 
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
+
     request_token_url=None,
     access_token_url='/oauth/access_token',
     authorize_url='https://www.facebook.com/dialog/oauth',
@@ -58,6 +64,47 @@ facebook = oauth.remote_app('facebook',
     consumer_secret=FACEBOOK_APP_SECRET,
     request_token_params={'scope': ('email, ')}
 )
+
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
 
 @facebook.tokengetter
 def get_facebook_token():
@@ -89,6 +136,7 @@ def logout():
     return redirect(url_4('index'))
 
 @app.route("/")
+@crossdomain(origin='http://localhost:5000')
 def index():
     user_name = 'null'
     try:
@@ -99,7 +147,7 @@ def index():
     except:
        pass
 
-    return render_template("base.html", user_name=user_name, url_4=url_4)
+    return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url)
 
 @app.route("/test")
 def test():

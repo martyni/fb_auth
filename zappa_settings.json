@@ -2,16 +2,29 @@
   "dev": {
           "s3_bucket" : "martyni-lambda",
           "app_function" : "my_app.app",
-          "parameter_depth": 1
+          "parameter_depth": 1,
+          "environment_variables": {
+                  "env": "dev",
+		  "static_host": "http://martyni-static.s3-website.eu-west-2.amazonaws.com",
+		  "static_path": "/auth/dev/app"
+          }		  
    },
   "stge": {
           "s3_bucket" : "martyni-lambda",
           "app_function" : "my_app.app",
-          "parameter_depth": 1
+          "parameter_depth": 1,
+          "environment_variables": {
+                  "env": "stge",
+		  "static": "http://martyni-static.s3-website.eu-west-2.amazonaws.com/auth/stge/app"
+          }		  
    },
   "prod": {
           "s3_bucket" : "martyni-lambda",
           "app_function" : "my_app.app",
-          "parameter_depth": 1
+          "parameter_depth": 1,
+          "environment_variables": {
+                  "env": "prod",
+		  "static": "http://martyni-static.s3-website.eu-west-2.amazonaws.com/auth/prod/app"
+          }		  
    }
 }
