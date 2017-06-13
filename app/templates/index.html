@@ -1,4 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
   <p> You are logged in </p>
+  <script>
+    function onLoad() { json = $.getJSON('https://boop.martyni.co.uk/api').done( function () {
+	           $.each(jsonesponseJSON.response,  function(show) {
+			   base = "https://boop.martyni.co.uk/";
+			   console.log(base);
+			   elem= '<a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show + ' RSS</a>';
+			                           console.log(element);
+			   $("#title").append(element); 
+			             }
+			          )}
+	        )}
+    $(document).ready( onLoad())
+  </script>
 {% endblock %}
