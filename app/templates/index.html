@@ -3,7 +3,7 @@
   <p> You are logged in </p>
   <script>
     function onLoad() { json = $.getJSON('https://boop.martyni.co.uk/api').done( function () {
-	           $.each(jsonesponseJSON.response,  function(show) {
+	           $.each(json.responseJSON.response,  function(show) {
 			   base = "https://boop.martyni.co.uk/";
 			   console.log(base);
 			   elem= '<a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show + ' RSS</a>';
