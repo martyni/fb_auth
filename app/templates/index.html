@@ -2,11 +2,14 @@
 {% block content %}
   <p> You are logged in </p>
   <script>
+    String.prototype.toProperCase = function () {
+	    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    };
     function onLoad() { json = $.getJSON('https://boop.martyni.co.uk/api').done( function () {
 	           $.each(json.responseJSON.response,  function(show) {
 			   base = "https://boop.martyni.co.uk/";
 			   console.log(base);
-			   element='<a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show + ' RSS</a>';
+			   element='<br/><a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show.toProperCase() + ' RSS</a>';
 			   console.log(element);
 			   $("#title").append(element); 
 			             }
