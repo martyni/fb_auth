@@ -6,8 +6,8 @@
 	           $.each(json.responseJSON.response,  function(show) {
 			   base = "https://boop.martyni.co.uk/";
 			   console.log(base);
-			   elem= '<a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show + ' RSS</a>';
-			                           console.log(element);
+			   element='<a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show + ' RSS</a>';
+			   console.log(element);
 			   $("#title").append(element); 
 			             }
 			          )}
