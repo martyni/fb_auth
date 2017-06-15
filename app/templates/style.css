@@ -1,7 +1,7 @@
 
 @font-face {
     font-family: header;
-    src: url('{{ static_url }}/header.otf');
+    src: url('{{ static_url }}/static/header.otf');
 }
 
 
