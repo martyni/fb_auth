@@ -11,7 +11,7 @@ email = "martynjamespratt@gmail.com"
 if environ.get("env"):
     static_url = environ.get("static_host") + environ.get("static_path")
 else:
-    static_url = ''
+    static_url = '/static'
 
 app = Flask(__name__, static_url_path='/static')
 def url_sanitizer(raw_path):
@@ -148,6 +148,12 @@ def index():
        pass
 
     return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url)
+
+@app.route("/style.css")
+def style():
+    template = render_template("style.css", static_url=static_url)
+    r = Response(template, mimetype="text/css")
+    return r
 
 @app.route("/test")
 def test():
