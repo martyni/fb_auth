@@ -102,3 +102,7 @@ ENV/
 
 # Secrets
 *secrets.py
+
+#images
+*jpg
+*svg
