@@ -11,7 +11,7 @@ email = "martynjamespratt@gmail.com"
 if environ.get("env"):
     static_url = environ.get("static_host") + environ.get("static_path")
 else:
-    static_url = ''
+    static_url = '/static'
 
 app = Flask(__name__, static_url_path='/static')
 def url_sanitizer(raw_path):
