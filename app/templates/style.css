@@ -1,11 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Caveat');
 
-@font-face {
-    font-family: header;
-    src: url('{{ static_url }}/static/header.otf');
-}
 
 
 
 h1 {
-    font-family: header;
+    font-family: 'Caveat', cursive;
 }
