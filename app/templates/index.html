@@ -1,20 +1,283 @@
 {% extends "base.html" %}
 {% block content %}
-  <p> You are logged in </p>
-  <script>
-    String.prototype.toProperCase = function () {
-	    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-    };
-    function onLoad() { json = $.getJSON('https://boop.martyni.co.uk/api').done( function () {
-	           $.each(json.responseJSON.response,  function(show) {
-			   base = "https://boop.martyni.co.uk/";
-			   console.log(base);
-			   element='<br/><a href="' + base + 'rss/' + show.split(" ").join('_') + '">' + show.toProperCase() + ' RSS</a>';
-			   console.log(element);
-			   $("#title").append(element); 
-			             }
-			          )}
-	        )}
-    $(document).ready( onLoad())
-  </script>
+<head>
+<script src="https://www.brython.info/src/brython_dist.js"></script>
+</head>
+<body onload="brython()">
+<script type="text/python">
+from browser import document, alert, ajax, html, console
+import json
+api_url = 'https://notdb.martyni.co.uk'
+
+
+html_elements = {
+"BLOCKQUOTE":html.BLOCKQUOTE,
+"OBJECT":html.OBJECT,
+"KEYGEN":html.KEYGEN,
+"LINK":html.LINK,
+"BR":html.BR,
+"OPTGROUP":html.OPTGROUP,
+"SUB":html.SUB,
+"PRE":html.PRE,
+"RP":html.RP,
+"FRAME":html.FRAME,
+"METER":html.METER,
+"SOURCE":html.SOURCE,
+"RB":html.RB,
+"BODY":html.BODY,
+"TH":html.TH,
+"FIGURE":html.FIGURE,
+"SVG":html.SVG,
+"FIGCAPTION":html.FIGCAPTION,
+"P":html.P,
+"BASE":html.BASE,
+"TFOOT":html.TFOOT,
+"VAR":html.VAR,
+"AUDIO":html.AUDIO,
+"MAP":html.MAP,
+"OL":html.OL,
+"TEXTAREA":html.TEXTAREA,
+"ACRONYM":html.ACRONYM,
+"MENU":html.MENU,
+"DT":html.DT,
+"DIALOG":html.DIALOG,
+"ADDRESS":html.ADDRESS,
+"NAV":html.NAV,
+"MAIN":html.MAIN,
+"CODE":html.CODE,
+"HR":html.HR,
+"ISINDEX":html.ISINDEX,
+"HEAD":html.HEAD,
+"LABEL":html.LABEL,
+"META":html.META,
+"DEL":html.DEL,
+"FONT":html.FONT,
+"SELECT":html.SELECT,
+"NOFRAMES":html.NOFRAMES,
+"CENTER":html.CENTER,
+"RTC":html.RTC,
+"KBD":html.KBD,
+"DATALIST":html.DATALIST,
+"HTML":html.HTML,
+"VIDEO":html.VIDEO,
+"ARTICLE":html.ARTICLE,
+"EM":html.EM,
+"FRAMESET":html.FRAMESET,
+"FIELDSET":html.FIELDSET,
+"BASEFONT":html.BASEFONT,
+"BDO":html.BDO,
+"BDI":html.BDI,
+"PARAM":html.PARAM,
+"S":html.S,
+"COMMAND":html.COMMAND,
+"DETAILS":html.DETAILS,
+"OUTPUT":html.OUTPUT,
+"INPUT":html.INPUT,
+"EMBED":html.EMBED,
+"HEADER":html.HEADER,
+"H2":html.H2,
+"H3":html.H3,
+"BUTTON":html.BUTTON,
+"SCRIPT":html.SCRIPT,
+"H6":html.H6,
+"H4":html.H4,
+"INS":html.INS,
+"UL":html.UL,
+"TIME":html.TIME,
+"STRIKE":html.STRIKE,
+"MATH":html.MATH,
+"OPTION":html.OPTION,
+"TITLE":html.TITLE,
+"SECTION":html.SECTION,
+"SUP":html.SUP,
+"SMALL":html.SMALL,
+"STRONG":html.STRONG,
+"COL":html.COL,
+"AREA":html.AREA,
+"MENUITEM":html.MENUITEM,
+"APPLET":html.APPLET,
+"RT":html.RT,
+"TABLE":html.TABLE,
+"B":html.B,
+"IMG":html.IMG,
+"PROGRESS":html.PROGRESS,
+"ASIDE":html.ASIDE,
+"DFN":html.DFN,
+"RUBY":html.RUBY,
+"SPAN":html.SPAN,
+"MARK":html.MARK,
+"TRACK":html.TRACK,
+"TEMPLATE":html.TEMPLATE,
+"DL":html.DL,
+"H1":html.H1,
+"WBR":html.WBR,
+"DD":html.DD,
+"TBODY":html.TBODY,
+"DIV":html.DIV,
+"H5":html.H5,
+"DATA":html.DATA,
+"LEGEND":html.LEGEND,
+"DIR":html.DIR,
+"NOSCRIPT":html.NOSCRIPT,
+"PICTURE":html.PICTURE,
+"COLGROUP":html.COLGROUP,
+"BIG":html.BIG,
+"TT":html.TT,
+"TR":html.TR,
+"LI":html.LI,
+"IFRAME":html.IFRAME,
+"TD":html.TD,
+"A":html.A,
+"STYLE":html.STYLE,
+"FORM":html.FORM,
+"I":html.I,
+"Q":html.Q,
+"CAPTION":html.CAPTION,
+"U":html.U,
+"ABBR":html.ABBR,
+"SUMMARY":html.SUMMARY,
+"THEAD":html.THEAD,
+"CANVAS":html.CANVAS,
+"FOOTER":html.FOOTER,
+"SAMP":html.SAMP,
+"CITE":html.CITE
+}
+
+
+def get_variables():
+    vars = document.get(selector='input.variable')
+    inputs = {}
+    total = 0
+    for each in vars:
+        inputs[each.id] = document[each.id].value
+        if "key" in each.id:
+           key_number = int(each.id[-1])
+           if key_number > total:
+              total = key_number
+    if inputs.get("key1"):
+       values = {}
+       for index in range(1,total + 1):
+          key = inputs["key" + str(index)]
+          if not key:
+             continue
+          value = inputs["value" + str(index)]
+          values[key] = value
+       inputs["value"] = values
+    return inputs
+
+
+def base_request(*args, **kwargs):
+    req = ajax.ajax()
+    req.bind('complete', on_complete)
+    req.open(*args)
+    req.set_header('content-type','application/x-www-form-urlencoded')
+    req.send(kwargs)
+
+def post_item():
+    vars = get_variables()
+    if vars.get("index") and vars.get("list"):
+       base_request('POST',api_url + '/' + vars["bucket"] + '/list/' + vars["list"] + "/" + vars["index"], True, data=vars["value"])
+    elif vars.get("list"):
+       base_request('POST',api_url + '/' + vars["bucket"] + '/list/' + vars["list"], True, data=vars["value"])
+
+def put_item():
+    vars = get_variables()
+    if vars.get("index") and vars.get("list"):
+       base_request('PUT',api_url + '/' + vars["bucket"] + '/list/' + vars["list"] + "/" + vars["index"], True, data=vars["value"])
+    elif vars.get("list"):
+       base_request('PUT',api_url + '/' + vars["bucket"] + '/list/' + vars["list"], True, data=vars["value"])
+
+def get_item():
+    vars = get_variables()
+    if vars.get("index") and vars.get("list"):
+       base_request('GET',api_url + '/' + vars["bucket"] + '/list/' + vars["list"] + "/" + vars["index"],True)
+    elif vars.get("list"):
+       base_request('GET',api_url + '/' + vars["bucket"] + '/list/' + vars["list"],True)
+
+def delete_item():
+    vars = get_variables()
+    if vars.get("index") and vars.get("list"):
+       base_request('DELETE',api_url + '/' + vars["bucket"] + '/list/' + vars["list"] + "/" + vars["index"],True)
+    elif vars.get("list"):
+       base_request('DELETE',api_url + '/' + vars["bucket"] + '/list/' + vars["list"],True)
+    else:
+       base_request('DELETE',api_url + '/' + vars["bucket"],True)
+
+def add_key_value():
+    vars = get_variables()
+    number_of_values = len([i for i in vars if "value" in i])
+    document['inputs'] <= html.BR()
+    document['inputs'] <= html.INPUT(Id="key{}".format(number_of_values), Class="variable")
+    document['inputs'] <= html.INPUT(Id="value{}".format(number_of_values), Class="variable")
+
+def handle_file_name(filename):
+    if "/" in filename:
+       filename = filename.split("/")[-1]
+    if "\\" in filename:
+       filename = filename.split("\\")[-1]
+    filename.replace(" ", "+")
+    return filename
+
+def upload_file():
+    vars = get_variables()
+    if vars.get("value") and vars.get("bucket"):
+       url = api_url + '/' + vars["bucket"] + '/file/' + vars["value"]
+    elif vars.get("bucket"):
+       file_name =  handle_file_name(document['file'].value)
+       url = api_url + '/' + vars["bucket"] + '/file/' + file_name
+    else:
+       return ''
+
+    document['file_uploader'].action = url
+
+def on_complete(req):
+    try:
+       alert(json.loads(req.text))
+    except:
+       alert(req.text)
+
+def send_element():
+   pass
+
+
+def add_send_types():
+   for i in sorted(html_elements):
+      document['elements'] <= html.OPTION(i, Value=i)
+
+add_send_types()
+document['send_element'].bind('click', send_element)
+document['post'].bind('click', post_item)
+document['put'].bind('click', put_item)
+document['get'].bind('click', get_item)
+document['delete'].bind('click', delete_item)
+document['key_value'].bind('click', add_key_value)
+document['upload'].bind('mouseenter', upload_file)
+#alert("{{ referrer }}")
+if '{{ referrer }}' != 'None':
+   document['iframe'].src ="{{ referrer }}"
+else:
+   pass
+</script>
+<div id="app">
+   <container id="inputs">
+      <input list="elements" id="send_element" class="variable" >
+      <datalist id="elements" ></datalist>
+      <input id="contents" class="variable">
+      <input id="bucket" class="variable">
+      <input id="list" class="variable">
+      <input id="value" class="variable">
+      <input id="index" class="variable">
+      <form id="file_uploader" action="/" method=post enctype=multipart/form-data>
+      <input id="file" name="FILE" type="file", class="variable">
+      <input id="upload" type=submit value=Upload >
+      </form>
+      <button id="post">post</button>
+      <button id="put">put</button>
+      <button id="get">get</button>
+      <button id="delete">delete</button>
+      <button id="key_value">+</button>
+   </container>
+   <br/>
+   <iframe id="iframe" width="100%" height="100%" frameborder="0"></iframe>
+</div>
 {% endblock %}

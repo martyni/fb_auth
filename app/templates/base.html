@@ -1,155 +1,47 @@
-<!doctype html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-	<!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
-	<link rel="stylesheet" type="text/css" href="{{ url_4("style") }}">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,700,700i">
-	<link rel="stylesheet" type="text/css" href="{{ static_url }}/style.css">
-	<script type=text/javascript>
-             $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-	</script>
-    </head>
-    <body>
-	    <div id="page">
-		    <header>
-			    <a class="logo" href="#"><span>Martyni</span></a>
-			    <div class="hero">
-				    <h1 id="title">A site with things </h1>
-				    <a class="btn" title="Get advice from top designers" href="#">Get advice<span> from top designers</span></a>
-			    </div>
-		    </header>
-		    <section class="main">
-			    <aside>
-				    <div class="content trending">
-				    	<h3><a href="#">What&apos;s trending</a></h3>
-                        		<p>Lorem ipsum dolor sit amet, consect etuer adipiscing elit. <a href="http://codifydesign.com">Morbi commodo</a>, ipsum sed pharetra gravida, orci magna rhoncus neque, id pulvinar odio lorem non turpis.</p>
-				    </div>
-			    </aside> 
-			    <aside>
-				    <div class="content find-it">
-                        		<h3><a href="#">Where to find it</a></h3>
-			                <p>Morbi commodo, ipsum sed pharetra gravida, orci magna rhoncus neque, id pulvinar odio lorem non turpis. Nullam sit amet enim. Lorem ipsum dolor sit amet, consect.</p>
-				    </div>
-			    </aside> 
-			    <aside>
-				    <div class="content tools">
-                                        <h3><a href="#">Tools of the trade</a></h3>
-			                <p>Nullam sit amet enim. Lorem ipsum dolor sit amet, cosect etuer adipiscing elit. Morbi commodo, ipsum sed pharetra gravida, orci rhoncus neque, id pulvinar odio.</p>
-				    </div>
-			    </aside> 
-		    
-		    </section>
-		    <section class="atmosphere">
-                         <article>
-                        	<h2>Creating a modern atmosphere</h2>
-                        	<p>Morbi commodo, ipsum sed pharetra gravida, orci magna rhoncus neque, id pulvinar odio lorem non turpis. Lorem ipsum dolor sit amet
- etuer adipiscing elit.  Pulvinar odio lorem non turpis. Nullam sit amet enim lorem.</p>
-				<a class="btn" title="creating a modern atmosphere" href="#">Learn More</a>
-			 </article>
-		    </section>
-		    <section class="how-to">
-			    <aside>
-				    <div class="content">
-					    <img alt="Choosing the proper seating" src="{{static_url}}/pictures/photo_seating.jpg">
-					    <h4>How-To: Seating</h4>
-                                            <p>Consectetuer adipiscing elit. Morbi commodo ipsum sed gravida orci magna rhoncus pulvinar odio lorem.</p>
-                                            <a title="Learn how to choose the proper seating." href="http://codifydesign.com">Learn more</a> 
-				    </div>
-			    </aside>
-			    <aside>
-				    <div class="content">
-					    <img alt="Choosing the proper lighting" src="{{static_url}}/pictures/photo_lighting.jpg">
-                                            <h4>How-To: Lighting</h4>
-                                            <p>Morbi commodo, ipsum sed pharetra gravida magna rhoncus neque id pulvinar odio lorem non turpis nullam sit amet.</p>
-                                            <a title="Learn how to choose the proper lighting." href="http://codifydesign.com">Learn more</a>
-				    </div>
-			    </aside>
-                            <blockquote>
- 				<p class="quote">Lorem ipsum dolor sit amet conse ctetuer adipiscing dolor sit amet consect adipiscing elit.</p>
-				<p class="credit"><strong>Author Name</strong> Martyni<br><em>Company Title</em> Martyni</p>
-                            </blockquote>
-		    </section>
-		    <nav>
-                        <ul>
-			    <li>
-				    <a title="About us" aria-haspopup="true" href="#">About us</a>
-				    <ul>
-					    <li>
-						    <a title="Sub Link 1" href="#"> Sub Link 1</a>
-					    </li>
-					    <li>
-						    <a title="Sub Link 2" href="#"> Sub Link 2</a>
-					    </li>
-				    </ul>
-			    </li>
-			    <li>
-				    <a title="Design Corner" aria-haspopup="true" ref="#" >Design Corner</a>
-				    <ul>
-					    <li>
-						    <a title="Sub Link 1" href="#"> Sub Link 1</a>
-					    </li>
-					    <li>
-						    <a title="Sub Link 2" href="#"> Sub Link 2</a>
-					    </li>
-					    <li>
-						    <a title="Sub Link 3" aria-haspopup="true" ref="#"> Sub Link 3</a>
-			                	    <ul>
-			                		    <li>
-			                			    <a title="Sub Sub Link 1" href="#"> Sub Sub Link 1</a>
-			                		    </li>
-			                		    <li>
-			                			    <a title="Sub Sub Link 2" href="#"> Sub Sub Link 2</a>
-			                		    </li>
-						   </ul>	    
-					   </li> 
-				    </ul>
-			    </li>
-			    <li>
-				    <a title="Products" aria-haspopup="true" ref="#">Products</a>
-				    <ul>
-					    <li>
-						    <a title="Sub Link 1" href="#"> Sub Link 1</a>
-					    </li>
-					    <li>
-						    <a title="Sub Link 2" href="#"> Sub Link 2</a>
-					    </li>
-				    </ul>
-			    </li>
-			    <li>
-				    <a title="Contact us" href="#">Contact us</a>
-			    </li>
-                            {% if not session.logged_in %}
-                            <li>
-				    <a href="{{ url_4("facebook_login") }}">Login or Signup</a>
-			    </li>
-                            {% else %}
-                            <li>
-				    <a href="{{ url_4("logout") }}">{{ user_name }} Logout</a>
-			    </li>
-                            {% endif %}
+<head>
+<script src="https://www.brython.info/src/brython_dist.js"></script>
+</head>
+<body onload="brython()" id="body">
+<script type="text/python">
+from browser import document, ajax, html
+import json
 
-                        </ul>
-                            {% if not session.logged_in %}
-			    <!--<p> You must login </p>-->
-                            {% else %}
-                            {% block content %}
-			    <!--<p> You are logged in </p>-->
-                            {% endblock%}
-                            {% endif%}
-		    </nav>
+api_url = "https://notdb.martyni.co.uk"
 
-		    <footer>
-			    &copy; Martyni things
-			    <div class="content">
-				    <a title="Privacy Policy" href="#"> Privacy Policy </a>
-				    <a title="Terms of Service" href="#"> Terms of service </a>
-			    </div>
-		    </footer>
-	</div>
-    </body>
+def on_complete(req):
+    stuff = json.loads(req.text)
+    for i in stuff:
+       print(i)
+
+def get_page():
+    req = ajax.ajax()
+    req.bind('complete', on_complete)
+    req.open('GET', api_url + '/martynicouk/list/page',True)
+    req.set_header('content-type','application/x-www-form-urlencoded')
+    req.send()
+
+get_page()
+</script>
+<nav>
+        {% if not session.logged_in %}
+        <li>
+    	    <a href="{{ url_4("facebook_login") }}">Login</a>
+        </li>
+        {% else %}
+        <li>
+    	    <a href="{{ url_4("logout") }}">{{ user_name }} Logout</a>
+        </li>
+        {% endif %}
+
+    </ul>
+        {% if not session.logged_in %}
+        <!--<p> You must login </p>-->
+        {% else %}
+        {% block content %}
+        <!--<p> You are logged in </p>-->
+        {% endblock%}
+        {% endif%}
+</nav>
+</body>
 </html>
-

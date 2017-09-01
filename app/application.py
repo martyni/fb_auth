@@ -105,7 +105,13 @@ def index():
     except:
        pass
     print static_url
-    return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url)
+    if request.args.get("refer"):
+
+       referrer= "https://notdb.martyni.co.uk" + request.args.get("refer")
+    else:
+       referrer = None
+    print referrer
+    return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url, referrer=referrer)
 
 @app.route("/style.css")
 def style():
