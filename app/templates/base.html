@@ -1,6 +1,8 @@
 <html>
 <head>
 <script src="https://www.brython.info/src/brython_dist.js"></script>
+<script src="https://www.brython.info/src/brython_dist.js"></script>
+<link rel="stylesheet" type="text/css" href="https://notdb.martyni.co.uk/authmartynicouk/file/style.css">
 </head>
 <body onload="brython()" >
 	<div id="page"></div>
@@ -10,17 +12,161 @@ import json
 
 api_url = "https://notdb.martyni.co.uk"
 
+html_elements = {
+"BLOCKQUOTE":html.BLOCKQUOTE,
+"OBJECT":html.OBJECT,
+"KEYGEN":html.KEYGEN,
+"LINK":html.LINK,
+"BR":html.BR,
+"OPTGROUP":html.OPTGROUP,
+"SUB":html.SUB,
+"PRE":html.PRE,
+"RP":html.RP,
+"FRAME":html.FRAME,
+"METER":html.METER,
+"SOURCE":html.SOURCE,
+"RB":html.RB,
+"BODY":html.BODY,
+"TH":html.TH,
+"FIGURE":html.FIGURE,
+"SVG":html.SVG,
+"FIGCAPTION":html.FIGCAPTION,
+"P":html.P,
+"BASE":html.BASE,
+"TFOOT":html.TFOOT,
+"VAR":html.VAR,
+"AUDIO":html.AUDIO,
+"MAP":html.MAP,
+"OL":html.OL,
+"TEXTAREA":html.TEXTAREA,
+"ACRONYM":html.ACRONYM,
+"MENU":html.MENU,
+"DT":html.DT,
+"DIALOG":html.DIALOG,
+"ADDRESS":html.ADDRESS,
+"NAV":html.NAV,
+"MAIN":html.MAIN,
+"CODE":html.CODE,
+"HR":html.HR,
+"ISINDEX":html.ISINDEX,
+"HEAD":html.HEAD,
+"LABEL":html.LABEL,
+"META":html.META,
+"DEL":html.DEL,
+"FONT":html.FONT,
+"SELECT":html.SELECT,
+"NOFRAMES":html.NOFRAMES,
+"CENTER":html.CENTER,
+"RTC":html.RTC,
+"KBD":html.KBD,
+"DATALIST":html.DATALIST,
+"HTML":html.HTML,
+"VIDEO":html.VIDEO,
+"ARTICLE":html.ARTICLE,
+"EM":html.EM,
+"FRAMESET":html.FRAMESET,
+"FIELDSET":html.FIELDSET,
+"BASEFONT":html.BASEFONT,
+"BDO":html.BDO,
+"BDI":html.BDI,
+"PARAM":html.PARAM,
+"S":html.S,
+"COMMAND":html.COMMAND,
+"DETAILS":html.DETAILS,
+"OUTPUT":html.OUTPUT,
+"INPUT":html.INPUT,
+"EMBED":html.EMBED,
+"HEADER":html.HEADER,
+"H2":html.H2,
+"H3":html.H3,
+"BUTTON":html.BUTTON,
+"SCRIPT":html.SCRIPT,
+"H6":html.H6,
+"H4":html.H4,
+"INS":html.INS,
+"UL":html.UL,
+"TIME":html.TIME,
+"STRIKE":html.STRIKE,
+"MATH":html.MATH,
+"OPTION":html.OPTION,
+"TITLE":html.TITLE,
+"SECTION":html.SECTION,
+"SUP":html.SUP,
+"SMALL":html.SMALL,
+"STRONG":html.STRONG,
+"COL":html.COL,
+"AREA":html.AREA,
+"MENUITEM":html.MENUITEM,
+"APPLET":html.APPLET,
+"RT":html.RT,
+"TABLE":html.TABLE,
+"B":html.B,
+"IMG":html.IMG,
+"PROGRESS":html.PROGRESS,
+"ASIDE":html.ASIDE,
+"DFN":html.DFN,
+"RUBY":html.RUBY,
+"SPAN":html.SPAN,
+"MARK":html.MARK,
+"TRACK":html.TRACK,
+"TEMPLATE":html.TEMPLATE,
+"DL":html.DL,
+"H1":html.H1,
+"WBR":html.WBR,
+"DD":html.DD,
+"TBODY":html.TBODY,
+"DIV":html.DIV,
+"H5":html.H5,
+"DATA":html.DATA,
+"LEGEND":html.LEGEND,
+"DIR":html.DIR,
+"NOSCRIPT":html.NOSCRIPT,
+"PICTURE":html.PICTURE,
+"COLGROUP":html.COLGROUP,
+"BIG":html.BIG,
+"TT":html.TT,
+"TR":html.TR,
+"LI":html.LI,
+"IFRAME":html.IFRAME,
+"TD":html.TD,
+"A":html.A,
+"STYLE":html.STYLE,
+"FORM":html.FORM,
+"I":html.I,
+"Q":html.Q,
+"CAPTION":html.CAPTION,
+"U":html.U,
+"ABBR":html.ABBR,
+"SUMMARY":html.SUMMARY,
+"THEAD":html.THEAD,
+"CANVAS":html.CANVAS,
+"FOOTER":html.FOOTER,
+"SAMP":html.SAMP,
+"CITE":html.CITE
+}
+
+
+
 def on_complete(req):
     stuff = json.loads(req.text)
     for i in stuff:
        print(i)
 
 def get_page():
-    req = ajax.ajax()
-    req.bind('complete', on_complete)
-    req.open('GET', api_url + '/martynicouk/list/page',True)
-    req.set_header('content-type','application/x-www-form-urlencoded')
-    req.send()
+   req = ajax.ajax()
+   req.bind('complete', update_page)
+   print(api_url + "/authmartynicouk/list/page")
+   req.open('GET', api_url + "/authmartynicouk/list/page", True)
+   req.send()
+
+def update_page(req):
+   page = json.loads(req.text)
+   for element in page:
+      print(element)
+      print(html_elements[element["type"]])
+      attributes = element["attributes"]
+      document['page'] <= html_elements[element["type"]](element["contents"], **attributes)
+
 
 get_page()
 </script>
@@ -36,6 +182,7 @@ get_page()
         {% endif %}
 
     </ul>
+</nav>
         {% if not session.logged_in %}
         <!--<p> You must login </p>-->
         {% else %}
@@ -43,6 +190,5 @@ get_page()
         <!--<p> You are logged in </p>-->
         {% endblock%}
         {% endif%}
-</nav>
 </body>
 </html>

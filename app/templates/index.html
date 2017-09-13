@@ -264,7 +264,6 @@ def update_page(req):
       document['page'] <= html_elements[element["type"]](element["contents"], **attributes)
 
 
-get_page()   
 add_send_types()
 document['send_html'].bind('click', send_html)
 document['post'].bind('click', post_item)
