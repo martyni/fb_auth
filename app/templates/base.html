@@ -5,7 +5,6 @@
 <link rel="stylesheet" type="text/css" href="https://notdb.martyni.co.uk/authmartynicouk/file/style.css">
 </head>
 <body onload="brython()" >
-	<div id="page"></div>
 <script type="text/python">
 from browser import document, ajax, html
 import json
@@ -145,7 +144,7 @@ html_elements = {
 "CITE":html.CITE
 }
 
-
+funcs = {}
 
 def on_complete(req):
     stuff = json.loads(req.text)
@@ -159,18 +158,53 @@ def get_page():
    req.open('GET', api_url + "/authmartynicouk/list/page", True)
    req.send()
 
+def get_each_element(url, counter):
+   req = ajax.ajax()
+   funcs[counter] = each_element
+   req.bind('complete', each_element)
+   req.open('GET',api_url + url)
+   req.send()
+   print(counter)
+   print(funcs[counter])
+
 def update_page(req):
    page = json.loads(req.text)
-   for element in page:
+   counter = 0
+   for element_link in page:
+      get_each_element(element_link, counter)
+      document['page'] <=html_elements["SPAN"]("", id=counter )
+      counter += 1
+
+def each_element(req):
+   element = json.loads(req.text)
+   try:
+      if type(element) == str:
+         new_s = element.replace(r'\n', '</br>').replace('""', "`").replace('\\','')
+         element = json.loads(new_s)
       print(element)
-      print(html_elements[element["type"]])
       attributes = element["attributes"]
-      document['page'] <= html_elements[element["type"]](element["contents"], **attributes)
+      article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
+      article_header = html_elements["H2"](element["title"].title(), **attributes)
+      article = html_elements[element["type"]](article_header +  element["contents"].replace(r"\\n", "") + article_footer, **attributes)	
+      document[req.responseURL[-1]] <= article
+   except:
+      print(element)
+	 
 
 
 get_page()
 </script>
+<div id="page">	
+        {% if not session.logged_in %}
+        <!--<p> You must login </p>-->
+        {% else %}
+        {% block content %}
+        <!--<p> You are logged in </p>-->
+        {% endblock%}
+        {% endif%}
+</div>
 <nav>
+     <ul>	
         {% if not session.logged_in %}
         <li>
     	    <a href="{{ url_4("facebook_login") }}">Login</a>
@@ -183,12 +217,5 @@ get_page()
 
     </ul>
 </nav>
-        {% if not session.logged_in %}
-        <!--<p> You must login </p>-->
-        {% else %}
-        {% block content %}
-        <!--<p> You are logged in </p>-->
-        {% endblock%}
-        {% endif%}
 </body>
 </html>

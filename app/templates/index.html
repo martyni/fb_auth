@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<head>
-<script src="https://www.brython.info/src/brython_dist.js"></script>
-</head>
-<body onload="brython()">
 <script type="text/python">
 from browser import document, alert, ajax, html, console
+import datetime
 import json
+import re
 api_url = 'https://notdb.martyni.co.uk'
 
 
@@ -146,6 +144,7 @@ html_elements = {
 
 def get_variables():
     vars = document.get(selector='input.variable')
+    vars += document.get(selector='textarea.variable')
     inputs = {}
     total = 0
     for each in vars:
@@ -240,8 +239,17 @@ def send_html():
    vars = get_variables()
    bucket = "authmartynicouk"
    alist = "page"
+   alert(vars)
    url = api_url + '/' + bucket + '/list/' + alist
-   base_request('POST',url, True, data={"type": vars["html"] , "contents": vars["contents"], "attributes":{"Class": "automatic"} })
+   date_ = str(datetime.datetime.utcnow())
+   data = {
+   "type": vars["html"] , 
+   "contents": vars["contents"], 
+   "attributes":{"Class": "automatic"} , 
+   "author": "Martyni",
+   "title": vars["title"],
+   "date": date_ }
+   base_request('POST',url, True, data=data)
 
 
 def add_send_types():
@@ -264,6 +272,11 @@ def update_page(req):
       document['page'] <= html_elements[element["type"]](element["contents"], **attributes)
 
 
+def split_refferer(refferer):
+   search = re.search(api_url + "\/(.*)\/file\/(.*)", refferer)
+   if search:
+      return search.group(1), search.group(2)
+
 add_send_types()
 document['send_html'].bind('click', send_html)
 document['post'].bind('click', post_item)
@@ -275,23 +288,75 @@ document['html'].bind('click', add_key_value)
 document['upload'].bind('mouseenter', upload_file)
 #alert("{{ referrer }}")
 if '{{ referrer }}' != 'None':
+   bucket,filename = split_refferer('{{ referrer }}')
+   document['bucket'].value = bucket
    document['iframe'].src ="{{ referrer }}"
 else:
    pass
 </script>
 <div id="app">
    <container id="inputs">
-      <input list="elements" id="html" class="variable" >
-      <datalist id="elements" ></datalist>
-      <input id="contents" class="variable">
-      <input id="bucket" class="variable">
-      <input id="list" class="variable">
-      <input id="value" class="variable">
-      <input id="index" class="variable">
-      <form id="file_uploader" action="/" method=post enctype=multipart/form-data>
-      <input id="file" name="FILE" type="file", class="variable">
-      <input id="upload" type=submit value=Upload >
-      </form>
+      <table>
+      <tr>
+	 <th>
+      		       Function
+	 </th><th>
+		       Value
+	 </th>   
+      </tr><tr>
+	 <td>
+      		       HTML
+	 </td><td>
+		       <input list="elements" id="html" class="variable" >
+            	       <datalist id="elements" ></datalist>
+	 </td>   
+      </tr><tr>
+	      <td>
+		       HTML contents
+	      </td><td>
+		       <textarea id="contents" type="text" class="variable"></textarea>
+	      </td>
+      </tr><tr>
+      </tr><tr>
+	      <td>
+		        Title
+	      </td><td>
+		        <input id="title" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+		        Bucket
+	      </td><td>
+		        <input id="bucket" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+      			List
+	      </td><td>
+			<input id="list" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+      			Value
+	      </td><td>
+			<input id="value" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+		      Index
+	      </td><td>
+		   	<input id="index" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+      			<form id="file_uploader" action="/" method=post enctype=multipart/form-data>
+      			<input id="file" name="FILE" type="file", class="variable">
+	      </td><td>
+			<input id="upload" type=submit value=Upload >
+       			</form>
+	      </td>
+      </tr>
+      </table>
       <button id="send_html">html</button>
       <button id="post">post</button>
       <button id="put">put</button>
