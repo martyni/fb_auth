@@ -146,17 +146,43 @@ html_elements = {
 
 funcs = {}
 
+
+def base_request(url, call_back):
+    req = ajax.ajax()
+    req.bind('complete', call_back)
+    req.open('GET', url, True)
+    req.send()
+
 def on_complete(req):
     stuff = json.loads(req.text)
     for i in stuff:
        print(i)
 
 def get_page():
+   get_links()
    req = ajax.ajax()
    req.bind('complete', update_page)
    print(api_url + "/authmartynicouk/list/page")
    req.open('GET', api_url + "/authmartynicouk/list/page", True)
    req.send()
+
+def update_navigation(req):
+    count = 0
+    links = json.loads(req.text)
+    order = {}
+    for element_link in links:
+       document["navigation"] <= html_elements["LI"](id="nav" + str(count))
+       def add_item(req, count=count):
+	  nav_place = str(count)
+	  print(nav_place + "My Place")
+          item = json.loads(req.text)
+          document['nav' + nav_place] <= html_elements["A"](item["name"].title(), href=item["href"])
+       order[count] = add_item
+       base_request( api_url + element_link, order[count])
+       count += 1	
+
+def get_links():
+    base_request(api_url + "/authmartynicouk/list/navigation", update_navigation)
 
 def get_each_element(url, counter):
    req = ajax.ajax()
@@ -203,8 +229,8 @@ get_page()
         {% endblock%}
         {% endif%}
 </div>
-<nav>
-     <ul>	
+<nav >
+     <ul id="navigation">	
         {% if not session.logged_in %}
         <li>
     	    <a href="{{ url_4("facebook_login") }}">Login</a>
@@ -214,7 +240,6 @@ get_page()
     	    <a href="{{ url_4("logout") }}">{{ user_name }} Logout</a>
         </li>
         {% endif %}
-
     </ul>
 </nav>
 </body>
