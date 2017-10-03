@@ -6,7 +6,7 @@
 </head>
 <body onload="brython()" >
 <script type="text/python">
-from browser import document, ajax, html
+from browser import document, ajax, html, markdown
 from browser.local_storage import storage
 import json
 
@@ -146,7 +146,7 @@ html_elements = {
 }
 
 funcs = {}
-
+storage.clear()
 try:
    print(storage["cache_hits"])
    hits = int(storage["cache_hits"])
@@ -169,6 +169,7 @@ def base_request(url, call_back, cache):
     req = ajax.ajax()
     req.bind('complete', call_back)
     req.open('GET', url, True)
+    print(url)
     req.send()
 
 def on_complete(req, text=None):
@@ -181,7 +182,7 @@ def on_complete(req, text=None):
 
 def get_page():
    get_links()
-   base_request(api_url + "/authmartynicouk/list/page", update_page, update_page)
+   base_request(api_url + "/authmartynicouk/list/page?reverse=true", update_page, update_page)
 
 def update_navigation(req, text=None):
     if text:
@@ -212,7 +213,28 @@ def update_links(links):
 def get_links():
     base_request(api_url + "/authmartynicouk/list/navigation", update_navigation, update_navigation)
 
-def get_each_element(url):
+def get_each_element(url, key=None):
+   def each_element(req, text=None, key=key):
+      if text:
+         element = json.loads(text)
+      else:
+         element = json.loads(req.text)
+         storage[req.responseURL] = req.text
+      if type(element) == str:
+         print(element)
+         new_s = element.replace(r'\n', '</br>').replace('""', "`").replace('\\','')
+         element = json.loads(new_s)
+      attributes = element["attributes"]
+      article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
+      article_header = html_elements["H1"](element["title"].title(), **attributes)
+      body, scripts = element["contents"]
+      body = body.replace(r"`", '"').replace(r'\\n', '</br>').replace(r"<p></p>","")
+      article_body = html_elements["P"]( body , **attributes)	
+      article = html_elements[element["type"]](article_header + article_body + article_footer)
+      document[key] <= article
+      for s in scripts:
+         exec(script, globals())
+      
    base_request(api_url + url, each_element, each_element)
 
 def update_page(req, text=None):
@@ -222,34 +244,20 @@ def update_page(req, text=None):
       page = json.loads(req.text)
       storage[req.responseURL] = req.text
    counter = 0
-   for element_link in page:
-      document['page'] <=html_elements["SPAN"]("", id=counter )
-      print("added span" + str(counter))
-      get_each_element(element_link)
-      counter += 1
+   if page:
+      for element_link in page:
+         document['page'] <=html_elements["SPAN"]("", id=counter )
+         print("added span" + str(counter))
+         get_each_element(element_link, key=str(counter))
+         counter += 1
 
 
-def each_element(req, text=None, key=0):
-   if text:
-      element = json.loads(text)
-      key=str(key)
-   else:
-      element = json.loads(req.text)
-      storage[req.responseURL] = req.text
-      key = req.responseURL[-1]
-   if type(element) == str:
-      new_s = element.replace(r'\n', '</br>').replace('""', "`").replace('\\','')
-      element = json.loads(new_s)
-   attributes = element["attributes"]
-   article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
-   article_header = html_elements["H2"](element["title"].title(), **attributes)
-   article = html_elements[element["type"]](article_header +  element["contents"].replace(r"\\n", "") + article_footer, **attributes)	
-   document[key] <= article
 
 
 get_page()
 </script>
 <div id="page">	
+</div>
         {% if not session.logged_in %}
         <!--<p> You must login </p>-->
         {% else %}
@@ -257,7 +265,6 @@ get_page()
         <!--<p> You are logged in </p>-->
         {% endblock%}
         {% endif%}
-</div>
 <nav >
      <ul id="navigation">	
         {% if not session.logged_in %}

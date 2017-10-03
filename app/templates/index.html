@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <script type="text/python">
-from browser import document, alert, ajax, html, console
+from browser import document, alert, ajax, html, console, markdown
 import datetime
 import json
 import re
 api_url = 'https://notdb.martyni.co.uk'
+box_added = False
 
 
 html_elements = {
@@ -235,20 +236,34 @@ def on_complete(req):
     except:
        alert(req.text)
 
+def create_markdown(raw_text):
+   return markdown.mark(raw_text)
+
 def send_html():
    vars = get_variables()
    bucket = "authmartynicouk"
    alist = "page"
-   alert(vars)
    url = api_url + '/' + bucket + '/list/' + alist
    date_ = str(datetime.datetime.utcnow())
-   data = {
-   "type": vars["html"] , 
-   "contents": vars["contents"], 
-   "attributes":{"Class": "automatic"} , 
-   "author": "Martyni",
-   "title": vars["title"],
-   "date": date_ }
+   md, scripts= create_markdown(vars["contents"])
+   md = md.replace('"', '`').replace("'", "`")
+   if not scripts:
+      data = {
+      "type": vars["html"] , 
+      "contents": [md, []], 
+      "attributes":{"Class": "automatic"} , 
+      "author": "Martyni",
+      "title": vars["title"],
+      "date": date_ }
+   else:
+      data = {
+      "type": vars["html"] , 
+      "contents": [md.replace('"', "`"), scripts], 
+      "attributes":{"Class": "automatic"} , 
+      "author": "Martyni",
+      "title": vars["title"],
+      "date": date_ }
+   alert(data)
    base_request('POST',url, True, data=data)
 
 
@@ -277,6 +292,26 @@ def split_refferer(refferer):
    if search:
       return search.group(1), search.group(2)
 
+def add_box():
+   try:
+      document['edit']
+   except:
+      old = document['page'].html
+      new = html_elements["SPAN"]("<article id='edit'></article>") 
+      print(type(new))
+      print(type(old))
+      document['page'].html =""
+      document['page'] <= new
+      document['page'].html += old
+      print("add_box")
+      box_added = True   
+   update_blog()
+
+def update_blog():
+   vars = get_variables()
+   document['edit'].html,scripts = create_markdown(vars['contents'])
+									    
+   
 add_send_types()
 document['send_html'].bind('click', send_html)
 document['post'].bind('click', post_item)
@@ -286,6 +321,10 @@ document['delete'].bind('click', delete_item)
 document['key_value'].bind('click', add_key_value)
 document['html'].bind('click', add_key_value)
 document['upload'].bind('mouseenter', upload_file)
+document['contents'].bind('focus', add_box)
+document['contents'].bind('keydown', update_blog)
+document['contents'].bind('keyup', update_blog)
+
 #alert("{{ referrer }}")
 if '{{ referrer }}' != 'None':
    bucket,filename = split_refferer('{{ referrer }}')
