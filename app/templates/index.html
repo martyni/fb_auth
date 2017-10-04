@@ -245,7 +245,7 @@ def send_html():
    alist = "page"
    url = api_url + '/' + bucket + '/list/' + alist
    date_ = str(datetime.datetime.utcnow())
-   md, scripts= create_markdown(vars["contents"])
+   md, scripts= update_blog()
    md = md.replace('"', '`').replace("'", "`")
    if not scripts:
       data = {
@@ -307,11 +307,28 @@ def add_box():
       box_added = True   
    update_blog()
 
+def cut_down_spaces(contents):
+   match1 = r'<br>\s*<br>'
+   match2 = r'<p></p>\s*<p></p>'
+   match3 = r'<p></p>'
+   match4 = r'\n'
+   print(contents)
+   print(type(contents))
+   contents = re.sub(match1,'', contents)
+   contents = re.sub(match2,'', contents)
+   contents = re.sub(match3,'', contents)
+   contents = re.sub(match4,'</p><p>', contents)
+   print(contents)
+   return contents
+
 def update_blog():
    vars = get_variables()
-   document['edit'].html,scripts = create_markdown(vars['contents'])
+   raw_markdown, scripts = create_markdown(vars['contents'])
+   article = cut_down_spaces(raw_markdown)
+   document['edit'].html = article
    for script in scripts:
        exc(script, globals())
+   return article, scripts    
 
 def toggle_visibility():
    if document['app'].style is {}:
