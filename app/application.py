@@ -1,9 +1,11 @@
 from flask import Flask, Response, request, url_for, redirect, jsonify, render_template, session, make_response, request, current_app
 from secrets import FACEBOOK_APP_ID, FACEBOOK_APP_SECRET
+from feedgen.feed import FeedGenerator
 from datetime import timedelta, datetime
 from functools import update_wrapper
 from flask_oauth import OAuth
 from os import environ
+import requests
 
 time_format = "%Y-%M-%d %H:%M:%s"
 author = "Martyn Pratt"
@@ -94,19 +96,68 @@ def logout():
     pop_login_session()
     return redirect(url_4('index'))
 
-@app.route("/")
-def index():
-    user_name = 'null'
+def facebook_auth():
     try:
        data = facebook.get('/me').data
-       if 'id' in data and 'name' in data:
-           user_id = data['id']
-           user_name = data['name']
+       return data
     except:
-       pass
-    print static_url
-    if request.args.get("refer"):
+       return None
 
+@app.route("/rss")
+def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
+    bucket = "authmartynicouk"
+    feed_url = "{db}/{bucket}/list/{feed}?reverse=true".format(
+            db=db,
+            bucket=bucket,
+            feed=feed
+            )
+    episodes_links = requests.get(feed_url).json()
+    episodes = [requests.get(db + link).json() for link in episodes_links]
+    print episodes
+    description = str(episodes[0].get('description'))
+    author      = str(episodes[0].get('author'))
+    title       = feed
+    email       = "martynjamespratt@gmail.com"
+    fg          = FeedGenerator()
+    fg.load_extension('podcast')
+    fg.id(request.url)
+    fg.podcast.itunes_category('Technology', 'Podcasting')
+    fg.author({'name': author, 'email': email})
+    fg.link(href=request.url, rel='self')
+    fg.description(description)
+    fg.title(title)
+    fg.image(url="{db}/{bucket}/file/{feed}_image.png".format(
+            db=db,
+            bucket=bucket,
+            feed=feed
+            ),
+            title=feed.title(),
+            link=request.url,
+            width='123',
+            height='123',
+            description=description)
+    counter = 1
+    for i in episodes:
+       fe = fg.add_entry()
+       fe.id(str(counter) + "mp3")
+       fe.title(i.get('title').title())
+       fe.description(i.get("contents")[0].replace("`", "'"))
+       if i.get("media"):
+          fe.enclosure(i.get("media"), 0, 'audio/mpeg')
+       fe.link(href=request.url, rel='alternate')
+       fe.author(name=i.get("author"), email=i.get("email")) 
+    return Response(fg.rss_str(), mimetype='text/xml')
+       
+
+@app.route("/")
+def index():
+    auth = facebook_auth()
+    if auth:
+        user_id = auth.get('id')
+        user_name = auth.get('name')
+    else:    
+        user_name = 'None'
+    if request.args.get("refer"):
        referrer= "https://notdb.martyni.co.uk" + request.args.get("refer")
     else:
        referrer = None
