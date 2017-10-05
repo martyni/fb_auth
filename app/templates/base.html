@@ -228,6 +228,9 @@ def get_each_element(url, key=None):
       attributes = element["attributes"]
       article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
       article_header = html_elements["H1"](element["title"].title(), **attributes)
+      if element.get("media"):
+         print("media")
+         article_header += html_elements["AUDIO"]("boop", src=element["media"],controls=True, type="audio/mpeg") 
       body, scripts = element["contents"]
       body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
       article_body = html_elements["P"]( body , **attributes)	
