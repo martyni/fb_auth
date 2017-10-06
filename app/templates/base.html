@@ -215,8 +215,28 @@ def update_links(links):
           document['nav' + nav_place] <= html_elements["A"](item["name"].title(), href=item["href"])
        order[count] = add_item
        base_request(req_url, order[count], order[count])
-       count += 1	
+       count += 1
+    container = html_elements["LI"]("<a>Tags</a>", id="tag_container")
+    container <= html_elements["UL"](id="tags_container")					    
+    document["navigation"] <= container	
+    get_tags()
 
+
+def get_tags():
+    base_request(api_url + "/authmartynicouk/list/tags", update_tags, update_tags)
+
+def update_tags(req, text=None):
+    if text:
+       tags = json.loads(text)
+    else:
+       tags = json.loads(req.text)
+       storage[req.responseURL] = req.text
+    for tag in tags:							  
+       print(tag)
+       tag_link = html_elements["LI"]()
+       tag_link <= html_elements["A"](tag, href="/?tags={}".format(tag))
+       document['tags_container'] <= tag_link 
+     	
 def get_links():
     base_request(api_url + "/authmartynicouk/list/navigation", update_navigation, update_navigation)
 
