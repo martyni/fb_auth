@@ -106,6 +106,8 @@ def facebook_auth():
 @app.route("/rss")
 def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
     bucket = "authmartynicouk"
+    if request.args.get("tag"):
+        feed=request.args.get("tag")
     feed_url = "{db}/{bucket}/list/{feed}?reverse=true".format(
             db=db,
             bucket=bucket,

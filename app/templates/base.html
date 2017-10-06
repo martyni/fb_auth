@@ -183,7 +183,13 @@ def on_complete(req, text=None):
 
 def get_page():
    get_links()
-   base_request(api_url + "/authmartynicouk/list/page?reverse=true", update_page, None)
+   print(document.query.getvalue("tags") is not None)
+   if document.query.getvalue("tags") is not None:
+      print(document.query.getvalue("tags"))
+      for tag in document.query["tags"].split(","):
+         base_request(api_url + "/authmartynicouk/list/{}?reverse=true".format(tag), update_page, None)
+   else:
+      base_request(api_url + "/authmartynicouk/list/page?reverse=true", update_page, None)
 
 def update_navigation(req, text=None):
     if text:
