@@ -10,6 +10,7 @@ import requests
 time_format = "%Y-%M-%d %H:%M:%s"
 author = "Martyn Pratt"
 email = "martynjamespratt@gmail.com"
+db_url = "https://notdb.martyni.co.uk"
 if environ.get("env"):
     static_url = environ.get("static_host") + environ.get("static_path")
 else:
@@ -151,8 +152,7 @@ def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
     return Response(fg.rss_str(), mimetype='text/xml')
        
 
-@app.route("/")
-def index():
+def base_variables():
     auth = facebook_auth()
     if auth:
         user_id = auth.get('id')
@@ -160,11 +160,23 @@ def index():
     else:    
         user_name = 'None'
     if request.args.get("refer"):
-       referrer= "https://notdb.martyni.co.uk" + request.args.get("refer")
+       referrer= db_url + request.args.get("refer")
     else:
        referrer = None
     print referrer
+    return referrer, user_name
+
+
+@app.route("/")
+def index():
+    referrer, user_name = base_variables()
     return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url, referrer=referrer)
+
+@app.route("/article/<article>")
+def article(article):
+    referrer, user_name = base_variables()
+    return render_template("article.html", user_name=user_name, url_4=url_4, static_url=static_url,  referrer=referrer, article=article )
+
 
 @app.route("/style.css")
 def style():

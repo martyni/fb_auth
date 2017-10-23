@@ -11,7 +11,6 @@ from browser.local_storage import storage
 import json
 
 api_url = "https://notdb.martyni.co.uk"
-
 html_elements = {
 "BLOCKQUOTE":html.BLOCKQUOTE,
 "OBJECT":html.OBJECT,
@@ -182,7 +181,7 @@ def on_complete(req, text=None):
 
 
 def get_page():
-   get_links()
+   print("get page")
    print(document.query.getvalue("tags") is not None)
    if document.query.getvalue("tags") is not None:
       print(document.query.getvalue("tags"))
@@ -238,11 +237,13 @@ def update_tags(req, text=None):
        document['tags_container'] <= tag_link 
      	
 def get_links():
+    print("get links")
     base_request(api_url + "/authmartynicouk/list/navigation", update_navigation, update_navigation)
 
 
 def just_the_tip(url):
    return url.split("/")[-1]
+
 
 def get_each_element(url, key=None):
    def each_element(req, text=None, key=key):
@@ -258,6 +259,14 @@ def get_each_element(url, key=None):
          element = json.loads(new_s)
       attributes = element["attributes"]
       article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
+      try:
+         print(element["tags"])
+         for tag in element["tags"]:
+   	    article_footer += html_elements["A"]("#" + tag , href="/rss?tag={}".format(tag))
+	    article_footer += html_elements["SPAN"](",")
+      except:
+         print("no tags")
+      article_footer += html_elements["A"]("#RSS" , href="/rss")
       article_header = html_elements["H1"](element["title"].title(), **attributes)
       link = "/article/" + just_the_tip(element.get("url"))
       article_header = html_elements["A"](article_header, href=link)
@@ -268,7 +277,10 @@ def get_each_element(url, key=None):
       body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
       article_body = html_elements["P"]( body , **attributes)	
       article = html_elements[element["type"]](article_header + article_body + article_footer)
-      document[key] <= article
+      if key:
+         document[key] <= article
+      else:
+         document["page"] <= article
       for s in scripts:
          exec(script, globals())
       
@@ -288,11 +300,17 @@ def update_page(req, text=None):
          get_each_element(element_link, key=str(counter))
          counter += 1
 
+def draw_article(url):
+   get_each_element("/authmartynicouk/thing/"+ url)
 
 
-get_page()
+
+
+
+draw_article("{{ article }}")											      
+get_links()
 </script>
-<div id="page">	
+<div id="page">
 </div>
         {% if not session.logged_in %}
         <!--<p> You must login </p>-->
@@ -303,6 +321,9 @@ get_page()
         {% endif%}
 <nav >
      <ul id="navigation">	
+	<li>
+	   <a href="/">Home</a>
+	</li> 
         {% if not session.logged_in %}
         <li>
     	    <a href="{{ url_4("facebook_login") }}">Login</a>
