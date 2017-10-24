@@ -250,7 +250,7 @@ def get_each_element(url, key=None):
       else:
          element = json.loads(req.text)
 	 element["url"] = req.responseURL
-         storage[req.responseURL] = req.text
+         storage[req.responseURL] = json.dumps(element)
       if type(element) == str:
          print(element)
          new_s = element.replace(r'\n', '').replace('""', "`").replace('\\','')
