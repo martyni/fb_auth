@@ -185,8 +185,11 @@ def index():
 
 @app.route("/article/<article>")
 def article(article):
-    referrer, user_name = base_variables()
-    return render_template("article.html", user_name=user_name, url_4=url_4, static_url=static_url, path=request.path, referrer=referrer, article=article )
+    variables = base_variables()
+    referrer = variables.get("referrer")
+    user_name =  variables.get("user_name")
+    admin = variables.get("admin")
+    return render_template("article.html", user_name=user_name, url_4=url_4, static_url=static_url, path=request.path,admin=admin, referrer=referrer, article=article )
 
 
 @app.route("/style.css")
