@@ -100,6 +100,11 @@ def logout():
 def facebook_auth():
     try:
        data = facebook.get('/me').data
+       print(dir(facebook.get('/me')))
+       if "172954053286345" in [group["id"] for group in facebook.get('/me/groups').data["data"]]:
+          data["admin"] = True
+       else:
+          data["admin"] = False
        return data
     except:
        return None
@@ -154,28 +159,34 @@ def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
 
 def base_variables():
     auth = facebook_auth()
+    data = {}
     if auth:
-        user_id = auth.get('id')
-        user_name = auth.get('name')
+        data["user_name"] = auth.get('name')
+        data["admin"] = auth.get('admin')
+        print(auth)
     else:    
         user_name = 'None'
     if request.args.get("refer"):
        referrer= db_url + request.args.get("refer")
     else:
        referrer = None
-    print referrer
-    return referrer, user_name
+    data["referrer"] = referrer   
+    print data
+    return data
 
 
 @app.route("/")
 def index():
-    referrer, user_name = base_variables()
-    return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url, referrer=referrer)
+    variables = base_variables()
+    referrer = variables.get("referrer")
+    user_name =  variables.get("user_name")
+    admin = variables.get("admin")
+    return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url, path=request.path, admin=admin, referrer=referrer)
 
 @app.route("/article/<article>")
 def article(article):
     referrer, user_name = base_variables()
-    return render_template("article.html", user_name=user_name, url_4=url_4, static_url=static_url,  referrer=referrer, article=article )
+    return render_template("article.html", user_name=user_name, url_4=url_4, static_url=static_url, path=request.path, referrer=referrer, article=article )
 
 
 @app.route("/style.css")

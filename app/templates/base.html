@@ -257,6 +257,14 @@ def get_each_element(url, key=None):
          element = json.loads(new_s)
       attributes = element["attributes"]
       article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
+      try:
+         print(element["tags"])
+         for tag in element["tags"]:
+             article_footer += html_elements["A"]("#" + tag , href="/rss?tag={}".format(tag))
+             article_footer += html_elements["SPAN"](",")
+      except:
+         print("no tags")
+      article_footer += html_elements["A"]("#RSS" , href="/rss")	 
       article_header = html_elements["H1"](element["title"].title(), **attributes)
       link = "/article/" + just_the_tip(element.get("url"))
       article_header = html_elements["A"](article_header, href=link)
@@ -267,7 +275,10 @@ def get_each_element(url, key=None):
       body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
       article_body = html_elements["P"]( body , **attributes)	
       article = html_elements[element["type"]](article_header + article_body + article_footer)
-      document[key] <= article
+      if key:
+         document[key] <= article
+      else:
+         document["page"] <= article
       for s in scripts:
          exec(script, globals())
       
@@ -287,21 +298,30 @@ def update_page(req, text=None):
          get_each_element(element_link, key=str(counter))
          counter += 1
 
-
-
+print("{{path}}")
+{% if path == "/" %}
+print("{{path}}")
 get_page()
+{% else %}
+print("{{path}}")
+{% block code %}
+{% endblock %}
+{% endif %}
 </script>
 <div id="page">	
 </div>
         {% if not session.logged_in %}
         <!--<p> You must login </p>-->
-        {% else %}
+        {% elif session.logged_in and admin %}
         {% block content %}
         <!--<p> You are logged in </p>-->
         {% endblock%}
         {% endif%}
 <nav >
      <ul id="navigation">	
+        <li>
+           <a href="/">Home</a>
+        </li>
         {% if not session.logged_in %}
         <li>
     	    <a href="{{ url_4("facebook_login") }}">Login</a>
