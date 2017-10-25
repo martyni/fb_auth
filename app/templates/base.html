@@ -328,7 +328,7 @@ print("{{path}}")
         </li>
         {% else %}
         <li>
-    	    <a href="{{ url_4("logout") }}">{{ user_name }} Logout</a>
+    	    <a href="{{ url_4("logout") }}">{{ user_name.split()[0] }} Logout</a>
         </li>
         {% endif %}
     </ul>
