@@ -147,10 +147,8 @@ html_elements = {
 
 funcs = {}
 try:
-   print(storage["cache_hits"])
    hits = int(storage["cache_hits"])
    hits += 1
-   print(hits)
    if not hits % 10:
       storage.clear()
       print("cache cleared")
@@ -195,6 +193,7 @@ def update_navigation(req, text=None):
        links = json.loads(text)
     else:
        links = json.loads(req.text)
+       storage[req.responseURL] = req.text
     update_links(links)
 
 def update_links(links):
