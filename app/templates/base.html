@@ -156,6 +156,28 @@ try:
 except:
    storage["cache_hits"] = "0"
 
+def get_variables():
+    vars = document.get(selector='input.variable')
+    vars += document.get(selector='textarea.variable')
+    inputs = {}
+    total = 0
+    for each in vars:
+        inputs[each.id] = document[each.id].value
+        if "key" in each.id:
+           key_number = int(each.id[-1])
+           if key_number > total:
+              total = key_number
+    if inputs.get("key1"):
+       values = {}
+       for index in range(1,total + 1):
+          key = inputs["key" + str(index)]
+          if not key:
+             continue
+          value = inputs["value" + str(index)]
+          values[key] = value
+       inputs["value"] = values
+    return inputs
+
 def base_request(url, call_back, cache):
     cache_hit = storage.get(url)
     if cache and cache_hit:

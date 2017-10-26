@@ -1,8 +1,87 @@
 {% extends "base.html" %}
 {% block code %}
-def draw_article(url):
-   get_each_element("/authmartynicouk/thing/"+ url)
+storage.clear()
+import datetime
 
+def get_comments(path):
+   path = "/authmartynicouk/list/" + path +"_comments?reverse=true"
+   base_request(api_url + path, update_comments, update_comments)
+
+def update_comments(req, text=None):   
+    if text:
+       comments = json.loads(text)
+    else:
+       comments = json.loads(req.text)
+       storage[req.responseURL] = req.text
+    counter = 0
+    for comment in comments:
+       def add_comment(req, count=counter, text=None):
+          place=str(count)
+          print("add_comment triggered")
+          if text:
+             comment = json.loads(text)
+          else:
+             comment = json.loads(req.text)
+             storage[req.responseURL] = req.text
+          print(comment) 
+	  print("This is the comment payload")
+	  id = place + "_comment"
+          document[id] <= html_elements["P"](comment["comment"])
+       id=str(counter) + "_comment" 
+       document["page"] <= html_elements["DIV"]("",id=id) 
+       base_request(api_url + comment, add_comment, add_comment)
+       counter +=1
+
+
+def base_post(path, payload):
+    print("this far?2")
+    req = ajax.ajax()
+    req.bind('complete', dummy)
+    print("this far?1")
+    req.open('PUT', api_url + path, True)
+    req.set_header('content-type','application/x-www-form-urlencoded')
+    print("this far?")
+    print(payload)
+    req.send(payload)
+
+def post_comment():
+    vars = get_variables()
+    print("{{ user_name }}")
+    payload = {"data": {
+       "user": "{{ user_name }}",
+       "comment": vars["comment"],
+       "date": str(datetime.datetime.utcnow())
+       }}
+    path = "/authmartynicouk/list/{{ article }}_comments"
+    base_post(path, payload) 
+
+  
+def dummy(req):
+   print(req.text)
+
+def draw_article(path):
+   get_comments(path)
+   get_each_element("/authmartynicouk/thing/"+ path)
+
+   
 get_links()
 draw_article("{{ article }}")											      
+document['commentbutton'].bind('click', post_comment)       
+{% endblock %}
+{% block content %}
+<div id="app">
+   <container id="inputs">
+      <table>
+        <tr>
+              <td>
+                        Comment
+              </td><td>
+                        <input id="comment" class="variable">
+              </td>
+        </tr>
+      </table>
+      <button id="commentbutton">comment</button>
+   </container>
+   <br/>
+</div>
 {% endblock %}
