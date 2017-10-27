@@ -350,11 +350,11 @@ print("{{path}}")
         </li>
         {% if not session.logged_in %}
         <li>
-    	    <a href="{{ url_4("facebook_login") }}">Login</a>
+		<a href="{{ url_4("facebook_login") + "?next=" + request.path }}">Login</a>
         </li>
         {% else %}
         <li>
-    	    <a href="{{ url_4("logout") }}">{{ user_name.split()[0] }} Logout</a>
+		<a href="{{ url_4("logout")  + "?next=" + request.path }}">{{ user_name.split()[0] }} Logout</a>
         </li>
         {% endif %}
     </ul>

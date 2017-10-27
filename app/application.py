@@ -95,7 +95,8 @@ def facebook_authorized(resp):
 @app.route("/logout")
 def logout():
     pop_login_session()
-    return redirect(url_4('index'))
+    next_url = request.args.get('next') or url_4('index')
+    return redirect(next_url)
 
 def facebook_auth():
     try:
@@ -181,7 +182,7 @@ def index():
     referrer = variables.get("referrer")
     user_name =  variables.get("user_name")
     admin = variables.get("admin")
-    return render_template("index.html", user_name=user_name, url_4=url_4, static_url=static_url, path=request.path, admin=admin, referrer=referrer)
+    return render_template("index.html", request=request, user_name=user_name, url_4=url_4, static_url=static_url, path=request.path, admin=admin, referrer=referrer)
 
 @app.route("/article/<article>")
 def article(article):
@@ -189,7 +190,7 @@ def article(article):
     referrer = variables.get("referrer")
     user_name =  variables.get("user_name")
     admin = variables.get("admin")
-    return render_template("article.html", user_name=user_name, url_4=url_4, static_url=static_url, path=request.path,admin=admin, referrer=referrer, article=article )
+    return render_template("article.html", request=request, user_name=user_name, url_4=url_4, static_url=static_url, path=request.path,admin=admin, referrer=referrer, article=article )
 
 
 @app.route("/style.css")
