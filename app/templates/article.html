@@ -3,8 +3,8 @@
 import datetime
 
 def get_comments(path):
-   path = "/authmartynicouk/list/" + path +"_comments?reverse=true"
-   base_request(api_url + path, update_comments, update_comments)
+   path = "/authmartynicouk/list/" + path +"_comments"
+   base_request(api_url + path, update_comments, None)
 
 def update_comments(req, text=None):   
     if text:
@@ -13,7 +13,7 @@ def update_comments(req, text=None):
        comments = json.loads(req.text)
        storage[req.responseURL] = req.text
     counter = 0
-    for comment in comments:
+    for comment in comments[::-1]:
        def add_comment(req, count=counter, text=None):
           place=str(count)
           print("add_comment triggered")
@@ -25,11 +25,16 @@ def update_comments(req, text=None):
           print(comment) 
 	  print("This is the comment payload")
 	  id = place + "_comment"
+          comment_text = comment["comment"].replace('¬', "'")
 	  comment_element = html_elements["ARTICLE"]("<h4>" + comment["user"] + "</h4>")
 	  comment_element <= html_elements["P"](comment["comment"])
 	  comment_element <= html_elements["P"](comment["date"], Class="date")
           document[id] <= comment_element
        id=str(counter) + "_comment" 
+       try:
+          document[id].clear()
+       except:
+          pass
        document["afterpage"] <= html_elements["DIV"]("", id=id, style={"display":"block"}) 
        base_request(api_url + comment, add_comment, add_comment)
        counter +=1
@@ -37,7 +42,7 @@ def update_comments(req, text=None):
 
 def base_post(path, payload):
     req = ajax.ajax()
-    req.bind('complete', dummy)
+    req.bind('complete', update_comments)
     req.open('PUT', api_url + path, True)
     req.set_header('content-type','application/x-www-form-urlencoded')
     print(payload)
@@ -46,17 +51,21 @@ def base_post(path, payload):
 def post_comment():
     vars = get_variables()
     print("{{ user_name }}")
+    md, scripts = markdown.mark(vars["comment"])
+    md = md.replace('"', '¬').replace("'", "¬").replace("\n", "</p><p>")
+    print(md) 
+    print("loooooki here")
     payload = {"data": {
        "user": "{{ user_name }}",
-       "comment": vars["comment"],
+       "comment": md,
+       "raw_comment": vars["comment"].replace('"', '¬').replace("'", "¬"),
+       "scripts": scripts,
        "date": str(datetime.datetime.utcnow())
        }}
     path = "/authmartynicouk/list/{{ article }}_comments"
     base_post(path, payload) 
 
-  
-def dummy(req):
-   print(req.text)
+
 
 def draw_article(path):
    get_comments(path)

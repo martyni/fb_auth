@@ -180,7 +180,7 @@ def get_variables():
 
 def base_request(url, call_back, cache):
     cache_hit = storage.get(url)
-    if cache and cache_hit:
+    if cache is not None and cache_hit:
        print("cache hit :" + url)
        print("contents :" + cache_hit)
        cache(None, text=cache_hit)
