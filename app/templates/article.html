@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block code %}
-storage.clear()
 import datetime
 
 def get_comments(path):
@@ -26,21 +25,21 @@ def update_comments(req, text=None):
           print(comment) 
 	  print("This is the comment payload")
 	  id = place + "_comment"
-          document[id] <= html_elements["P"](comment["comment"])
+	  comment_element = html_elements["ARTICLE"]("<h4>" + comment["user"] + "</h4>")
+	  comment_element <= html_elements["P"](comment["comment"])
+	  comment_element <= html_elements["P"](comment["date"], Class="date")
+          document[id] <= comment_element
        id=str(counter) + "_comment" 
-       document["page"] <= html_elements["DIV"]("",id=id) 
+       document["afterpage"] <= html_elements["DIV"]("", id=id, style={"display":"block"}) 
        base_request(api_url + comment, add_comment, add_comment)
        counter +=1
 
 
 def base_post(path, payload):
-    print("this far?2")
     req = ajax.ajax()
     req.bind('complete', dummy)
-    print("this far?1")
     req.open('PUT', api_url + path, True)
     req.set_header('content-type','application/x-www-form-urlencoded')
-    print("this far?")
     print(payload)
     req.send(payload)
 
@@ -66,21 +65,23 @@ def draw_article(path):
    
 get_links()
 draw_article("{{ article }}")											      
-document['commentbutton'].bind('click', post_comment)       
+try:							  
+   document['commentbutton'].bind('click', post_comment)       
+except:
+   pass
 {% endblock %}
 {% block content %}
-<div id="app">
+<div id="commentbox">
    <container id="inputs">
       <table>
         <tr>
               <td>
-                        Comment
+                       Add comment <input id="comment" class="variable">
               </td><td>
-                        <input id="comment" class="variable">
+                        <button id="commentbutton">comment</button>
               </td>
         </tr>
       </table>
-      <button id="commentbutton">comment</button>
    </container>
    <br/>
 </div>

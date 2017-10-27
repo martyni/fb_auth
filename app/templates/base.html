@@ -329,15 +329,20 @@ print("{{path}}")
 {% endblock %}
 {% endif %}
 </script>
-<div id="page">	
-</div>
+<div id="container" style="width:1000px;margin:auto;">
+   <div id="page">	
+   </div>
         {% if not session.logged_in %}
-        <!--<p> You must login </p>-->
         {% elif session.logged_in and admin %}
+        {% block admin %}
+        {% endblock%}
+        {% elif session.logged_in and not admin %}
         {% block content %}
-        <!--<p> You are logged in </p>-->
         {% endblock%}
         {% endif%}
+   <div id="afterpage">
+   </div>	
+</div>
 <nav >
      <ul id="navigation">	
         <li>
