@@ -4,7 +4,7 @@ import datetime
 
 def get_comments(path):
    path = "/authmartynicouk/list/" + path +"_comments"
-   base_request(api_url + path, update_comments, None)
+   base_request(api_url + path, update_comments, update_comments)
 
 def update_comments(req, text=None):   
     if text:
@@ -16,14 +16,11 @@ def update_comments(req, text=None):
     for comment in comments[::-1]:
        def add_comment(req, count=counter, text=None):
           place=str(count)
-          print("add_comment triggered")
           if text:
              comment = json.loads(text)
           else:
              comment = json.loads(req.text)
              storage[req.responseURL] = req.text
-          print(comment) 
-	  print("This is the comment payload")
 	  id = place + "_comment"
           comment_text = comment["comment"].replace('¬', "'")
 	  comment_element = html_elements["ARTICLE"]("<h4>" + comment["user"] + "</h4>")
@@ -47,16 +44,12 @@ def base_post(path, payload):
     req.bind('complete', update_comments)
     req.open('PUT', api_url + path, True)
     req.set_header('content-type','application/x-www-form-urlencoded')
-    print(payload)
     req.send(payload)
 
 def post_comment():
     vars = get_variables()
-    print("{{ user_name }}")
     md, scripts = markdown.mark(vars["comment"])
     md = md.replace('"', '¬').replace("'", "¬").replace("\n", "</p><p>")
-    print(md) 
-    print("loooooki here")
     payload = {"data": {
        "user": "{{ user_name }}",
        "comment": md,
@@ -65,6 +58,7 @@ def post_comment():
        "date": str(datetime.datetime.utcnow())
        }}
     path = "/authmartynicouk/list/{{ article }}_comments"
+    storage.clear()
     base_post(path, payload) 
 
 

@@ -191,7 +191,6 @@ def base_request(url, call_back, cache):
     req = ajax.ajax()
     req.bind('complete', call_back)
     req.open('GET', url, True)
-    print(url)
     req.send()
 
 def on_complete(req, text=None):
@@ -205,9 +204,7 @@ def on_complete(req, text=None):
 
 def get_page():
    get_links()
-   print(document.query.getvalue("tags") is not None)
    if document.query.getvalue("tags") is not None:
-      print(document.query.getvalue("tags"))
       for tag in document.query["tags"].split(","):
          base_request(api_url + "/authmartynicouk/list/{}?reverse=true".format(tag), update_page, None)
    else:
@@ -231,7 +228,6 @@ def update_links(links):
 	  if text is not None:
 	     item = json.loads(text)
 	  else:
-	     print(req.responseURL, " set to ",  req.text)
 	     storage[req.responseURL] = req.text
              item = json.loads(req.text)
 	  nav_place = str(count)
@@ -255,7 +251,6 @@ def update_tags(req, text=None):
        tags = json.loads(req.text)
        storage[req.responseURL] = req.text
     for tag in tags:							  
-       print(tag)
        tag_link = html_elements["LI"]()
        tag_link <= html_elements["A"](tag, href="/?tags={}".format(tag))
        document['tags_container'] <= tag_link 
@@ -268,17 +263,24 @@ def just_the_tip(url):
    return url.split("/")[-1]
 
 
+def plural(number):
+   return "" if number is 1 else "s"
 
 def handle_time(a_datetime):
    diff = now - a_datetime
    if diff < datetime.timedelta(minutes=1):
       return "just now"
    if diff <  datetime.timedelta(hours=1):
-      return "{} minutes ago".format(int(diff.seconds / 60 ))
+      minutes = int(diff.seconds / 60 )
+      more_than_one = plural(minutes)
+      return "{} minute{} ago".format(minutes, more_than_one)
    if diff < datetime.timedelta(days=1):
-      return "{} hours ago".format(int(diff.seconds / 3600))
+      hours = int(diff.seconds / 3600)
+      more_than_one = plural(hours)
+      return "{} hour{} ago".format(hours, more_than_one)
    if diff < datetime.timedelta(weeks=1):
-      return "{} days ago".format(diff.days)
+      more_than_one = plural(diff.days)
+      return "{} day{} ago".format(diff.days, more_than_one)
    if diff > datetime.timedelta(weeks=1):
       return a_datetime.strftime("%d-%m-%Y")
 
@@ -291,16 +293,13 @@ def get_each_element(url, key=None):
 	 element["url"] = req.responseURL
          storage[req.responseURL] = json.dumps(element)
       if type(element) == str:
-         print(element)
          new_s = element.replace(r'\n', '').replace('""', "`").replace('\\','')
          element = json.loads(new_s)
       attributes = element["attributes"]
       date_of_post = parse_time(element["date"])
       date_string = handle_time(date_of_post)
-      print(date_string)
       article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](date_string, Class="date")
       try:
-         print(element["tags"])
          for tag in element["tags"]:
              article_footer += html_elements["A"]("#" + tag , href="/rss?tag={}".format(tag))
              article_footer += html_elements["SPAN"](",")
@@ -311,7 +310,6 @@ def get_each_element(url, key=None):
       link = "/article/" + just_the_tip(element.get("url"))
       article_header = html_elements["A"](article_header, href=link)
       if element.get("media"):
-         print("media")
          article_header += html_elements["AUDIO"]("boop", src=element["media"],controls=True, type="audio/mpeg") 
       body, scripts = element["contents"]
       body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
@@ -336,16 +334,13 @@ def update_page(req, text=None):
    if page:
       for element_link in page:
          document['page'] <=html_elements["SPAN"]("", id=counter )
-         print("added span" + str(counter))
          get_each_element(element_link, key=str(counter))
          counter += 1
 
 now = datetime.datetime.utcnow()
 {% if path == "/" %}
-print("{{path}}")
 get_page()
 {% else %}
-print("{{path}}")
 {% block code %}
 {% endblock %}
 {% endif %}
