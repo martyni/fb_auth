@@ -28,7 +28,9 @@ def update_comments(req, text=None):
           comment_text = comment["comment"].replace('¬', "'")
 	  comment_element = html_elements["ARTICLE"]("<h4>" + comment["user"] + "</h4>")
 	  comment_element <= html_elements["P"](comment["comment"])
-	  comment_element <= html_elements["P"](comment["date"], Class="date")
+          date = parse_time(comment["date"])
+	  date_string = handle_time(date)
+	  comment_element <= html_elements["P"](date_string, Class="date")
           document[id] <= comment_element
        id=str(counter) + "_comment" 
        try:

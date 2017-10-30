@@ -9,7 +9,7 @@
 from browser import document, ajax, html, markdown
 from browser.local_storage import storage
 import json
-
+import datetime
 api_url = "https://notdb.martyni.co.uk"
 
 html_elements = {
@@ -156,6 +156,9 @@ try:
 except:
    storage["cache_hits"] = "0"
 
+def parse_time(datestring):
+   return datetime.datetime.strptime(datestring, "%Y-%m-%d %I:%M:%S.%f")
+
 def get_variables():
     vars = document.get(selector='input.variable')
     vars += document.get(selector='textarea.variable')
@@ -264,6 +267,21 @@ def get_links():
 def just_the_tip(url):
    return url.split("/")[-1]
 
+
+
+def handle_time(a_datetime):
+   diff = now - a_datetime
+   if diff < datetime.timedelta(minutes=1):
+      return "just now"
+   if diff <  datetime.timedelta(hours=1):
+      return "{} minutes ago".format(diff.minutes)
+   if diff < datetime.timedelta(days=1):
+      return "{} hours ago".format(diff.hours)
+   if diff < datetime.timedelta(weeks=1):
+      return "{} days ago".format(diff.days)
+   if diff > datetime.timedelta(weeks=1):
+      return a_datetime.strftime("%d-%m-%Y")
+
 def get_each_element(url, key=None):
    def each_element(req, text=None, key=key):
       if text:
@@ -277,7 +295,10 @@ def get_each_element(url, key=None):
          new_s = element.replace(r'\n', '').replace('""', "`").replace('\\','')
          element = json.loads(new_s)
       attributes = element["attributes"]
-      article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](element["date"], Class="date")
+      date_of_post = parse_time(element["date"])
+      date_string = handle_time(date_of_post)
+      print(date_string)
+      article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](date_string, Class="date")
       try:
          print(element["tags"])
          for tag in element["tags"]:
@@ -319,7 +340,7 @@ def update_page(req, text=None):
          get_each_element(element_link, key=str(counter))
          counter += 1
 
-print("{{path}}")
+now = datetime.datetime.utcnow()
 {% if path == "/" %}
 print("{{path}}")
 get_page()
