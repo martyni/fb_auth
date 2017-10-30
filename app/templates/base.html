@@ -274,9 +274,9 @@ def handle_time(a_datetime):
    if diff < datetime.timedelta(minutes=1):
       return "just now"
    if diff <  datetime.timedelta(hours=1):
-      return "{} minutes ago".format(diff.minutes)
+      return "{} minutes ago".format(diff.seconds / 60 )
    if diff < datetime.timedelta(days=1):
-      return "{} hours ago".format(diff.hours)
+      return "{} hours ago".format(diff.seconds / 3600)
    if diff < datetime.timedelta(weeks=1):
       return "{} days ago".format(diff.days)
    if diff > datetime.timedelta(weeks=1):
