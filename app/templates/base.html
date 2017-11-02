@@ -9,7 +9,6 @@
 from browser import document, ajax, html, markdown
 from browser.local_storage import storage
 import json
-import datetime
 api_url = "https://notdb.martyni.co.uk"
 
 html_elements = {
@@ -353,7 +352,6 @@ def update_page(req, text=None):
          get_each_element(element_link, key=str(counter))
          counter += 1
 
-now = datetime.datetime.utcnow()
 {% if path == "/" %}
 get_page()
 {% else %}
