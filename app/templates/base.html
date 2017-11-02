@@ -284,6 +284,7 @@ def handle_time(a_datetime):
    if diff > datetime.timedelta(weeks=1):
       return a_datetime.strftime("%d-%m-%Y")
 
+
 def get_each_element(url, key=None):
    def each_element(req, text=None, key=key):
       if text:
@@ -296,9 +297,39 @@ def get_each_element(url, key=None):
          new_s = element.replace(r'\n', '').replace('""', "`").replace('\\','')
          element = json.loads(new_s)
       attributes = element["attributes"]
-      date_of_post = parse_time(element["date"])
-      date_string = handle_time(date_of_post)
-      article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author") + html_elements["P"](date_string, Class="date")
+      link = "/article/" + just_the_tip(element.get("url"))
+      article_header = html_elements["H1"](element["title"].title(), **attributes)
+      article_header = html_elements["A"](article_header, href=link)
+      if element.get("media"):
+         article_header += html_elements["AUDIO"]("boop", src=element["media"],controls=True, type="audio/mpeg") 
+      body, scripts = element["contents"]
+      body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
+      article_body = html_elements["P"]( body , **attributes)	
+      article = html_elements[element["type"]](article_header + article_body , id="article_{}".format(key))
+      if key:
+         document[key] <= article
+      else:
+         document["page"] <= article
+      
+      for s in scripts:
+         exec(script, globals())
+      handle_footer(element, "article_{}".format(key))
+      
+   base_request(api_url + url, each_element, each_element)
+
+
+def parse_time(date_str, element_id):
+   def time_callback(req, text=None, element_id=element_id):
+      if text:
+         date = json.loads(text)
+      else:
+         date = json.loads(req.text)
+      document[element_id] <= html_elements["P"](date, Class="date")
+   print(date_str)
+   base_request("/date/{}".format(date_str), time_callback, None)
+
+def handle_footer(element, element_id):
+      article_footer = html_elements["P"]("</br>Author: <i>" + element["author"] + "</i>", Class="author", id=element_id +"_footer")
       try:
          for tag in element["tags"]:
              article_footer += html_elements["A"]("#" + tag , href="/rss?tag={}".format(tag))
@@ -306,23 +337,8 @@ def get_each_element(url, key=None):
       except:
          print("no tags")
       article_footer += html_elements["A"]("#RSS" , href="/rss")	 
-      article_header = html_elements["H1"](element["title"].title(), **attributes)
-      link = "/article/" + just_the_tip(element.get("url"))
-      article_header = html_elements["A"](article_header, href=link)
-      if element.get("media"):
-         article_header += html_elements["AUDIO"]("boop", src=element["media"],controls=True, type="audio/mpeg") 
-      body, scripts = element["contents"]
-      body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
-      article_body = html_elements["P"]( body , **attributes)	
-      article = html_elements[element["type"]](article_header + article_body + article_footer)
-      if key:
-         document[key] <= article
-      else:
-         document["page"] <= article
-      for s in scripts:
-         exec(script, globals())
-      
-   base_request(api_url + url, each_element, each_element)
+      document[element_id] <= article_footer
+      parse_time(element["date"], element_id + "_footer")
 
 def update_page(req, text=None):
    if text:

@@ -199,6 +199,29 @@ def style():
     r = Response(template, mimetype="text/css")
     return r
 
+@app.route("/date/<datestring>")
+def return_datestring(datestring):
+   def plural(number):
+      return "" if number is 1 else "s"
+   print datestring
+   then = datetime.strptime(datestring,  "%Y-%m-%d %H:%M:%S.%f")
+   diff = datetime.utcnow() - then
+   if diff < timedelta(minutes=1):
+      return jsonify("just now")
+   if diff <  timedelta(hours=1):
+      minutes = int(diff.seconds / 60 )
+      more_than_one = plural(minutes)
+      return jsonify("{} minute{} ago".format(minutes, more_than_one))
+   if diff < timedelta(days=1):
+      hours = int(diff.seconds / 3600)
+      more_than_one = plural(hours)
+      return jsonify("{} hour{} ago".format(hours, more_than_one))
+   if diff < timedelta(weeks=1):
+      more_than_one = plural(diff.days)
+      return jsonify("{} day{} ago".format(diff.days, more_than_one))
+   if diff > timedelta(weeks=1):
+      return jsonify(then.strftime("%d-%m-%Y"))
+
 @app.route("/test")
 def test():
     return "OMG"
