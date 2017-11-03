@@ -7,6 +7,7 @@ from functools import update_wrapper
 from flask_oauth import OAuth
 from os import environ
 import requests
+import json
 
 time_format = "%Y-%M-%d %H:%M:%s"
 author = "Martyn Pratt"
@@ -123,7 +124,6 @@ def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
             )
     episodes_links = requests.get(feed_url).json()
     episodes = [requests.get(db + link).json() for link in episodes_links]
-    print episodes
     description = str(episodes[0].get('description'))
     author      = str(episodes[0].get('author'))
     title       = feed
@@ -147,19 +147,26 @@ def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
             height='123',
             description=description)
     counter = 1
+
     for i in episodes:
-       author = i.get("author") or "anonymous"
-       email = i.get("email") or "anonymous@anonymous.com"
-       title = str(i.get('title')).title() or "title"
-       contents = i.get("contents")[0].replace("`", "'").replace(u"¬", "'") or "contents"
-       fe = fg.add_entry()
-       fe.id(str(counter) + "mp3")
-       fe.title(str(i.get('title')).title())
-       fe.description(contents)
-       if i.get("media"):
-          fe.enclosure(i.get("media"), 0, 'audio/mpeg')
-       fe.link(href=request.url, rel='alternate')
-       fe.author(name=author, email=email) 
+       try:
+          print type(i)
+          if type(i) is not dict:
+              i = json.loads('"' + i.replace('"', "'") + '"')
+          author = i.get("author") or "anonymous"
+          email = i.get("email") or "anonymous@anonymous.com"
+          title = str(i.get('title')).title() or "title"
+          contents = i.get("contents")[0].replace("`", "'").replace(u"¬", "'") or "contents"
+          fe = fg.add_entry()
+          fe.id(str(counter) + "mp3")
+          fe.title(str(i.get('title')).title())
+          fe.description(contents)
+          if i.get("media"):
+             fe.enclosure(i.get("media"), 0, 'audio/mpeg')
+          fe.link(href=request.url, rel='alternate')
+          fe.author(name=author, email=email) 
+       except:
+          pass
        counter += 1
     return Response(fg.rss_str(), mimetype='text/xml')
        
