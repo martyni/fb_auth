@@ -10,7 +10,7 @@ from browser import document, ajax, html, markdown
 from browser.local_storage import storage
 import json
 api_url = "https://notdb.martyni.co.uk"
-
+request_url = "{{ request.url }}"
 html_elements = {
 "BLOCKQUOTE":html.BLOCKQUOTE,
 "OBJECT":html.OBJECT,
@@ -301,8 +301,10 @@ def get_each_element(url, key=None):
       article_header = html_elements["A"](article_header, href=link)
       if element.get("media"):
          article_header += html_elements["AUDIO"]("boop", src=element["media"],controls=True, type="audio/mpeg") 
+      elif element.get("picture_link") and request_url[-1] != "/":
+	 article_header += html_elements["IMG"](src=element["picture_link"],  style={"max-height":"250px"})
       body, scripts = element["contents"]
-      body = body.replace(r"`", "'").replace(r'\\n', '').replace(r"<p></p>","")
+      body = body.replace(r"`", "'").replace("¬", "'").replace(r'\\n', '').replace(r"<p></p>","")
       article_body = html_elements["P"]( body , **attributes)	
       article = html_elements[element["type"]](article_header + article_body , id="article_{}".format(key))
       if key:
@@ -351,7 +353,7 @@ def update_page(req, text=None):
          document['page'] <=html_elements["SPAN"]("", id=counter )
          get_each_element(element_link, key=str(counter))
          counter += 1
-
+print(request_url)
 {% if path == "/" %}
 get_page()
 {% else %}

@@ -13,6 +13,8 @@ def update_comments(req, text=None):
        comments = json.loads(req.text)
        storage[req.responseURL] = req.text
     counter = 0
+    if comments is None:
+       return None
     for comment in comments[::-1]:
        def add_comment(req, count=counter, text=None):
           place=str(count)

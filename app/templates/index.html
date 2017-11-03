@@ -246,27 +246,24 @@ def send_html():
    url = api_url + '/' + bucket + '/list/' + alist
    date_ = str(datetime.datetime.utcnow())
    md, scripts= update_blog()
-   md = md.replace('"', '`').replace("'", "`")
-   if not scripts:
-      data = {
-      "type": vars["html"] , 
-      "contents": [md, []], 
-      "attributes":{"Class": "automatic"} , 
-      "media": vars["media"],
-      "author": "Martyni",
-      "title": vars["title"],
-      "tags": vars["tags"].split(","),
-      "date": date_ }
+   md = md.replace('"', '¬').replace("'", "¬")
+   if not vars["tags"]:
+      tags = []
    else:
-      data = {
-      "type": vars["html"] , 
-      "contents": [md.replace('"', "`"), scripts], 
-      "attributes":{"Class": "automatic"} , 
+      tags = vars["tags"].split(",")
+   data = {
+      "type": vars["html"] ,
+      "contents": [md, []],
+      "attributes":{"Class": "automatic"} ,
       "media": vars["media"],
-      "author": "Martyni",
+      "author": "{{ user_name }}",
       "title": vars["title"],
-      "tags": vars["tags"].split(","),
-      "date": date_ }
+      "tags": tags,
+      "date": date_ ,
+      "picture_link": vars["picture_link"]
+   } 
+   if scripts:
+      data["contents"] = [md, scripts] 
    alert(data)
    if vars["tags"]:
       base_request('POST',url +"?tags={}".format(vars["tags"]), True, data=data)
@@ -351,11 +348,6 @@ def toggle_visibility():
       document['app'].style = {'display' : 'none'} 
       print('None')
 
-
-
-
-
-
 add_send_types()
 document['send_html'].bind('click', send_html)
 document['post'].bind('click', post_item)
@@ -375,7 +367,10 @@ if '{{ referrer }}' != 'None':
    bucket,filename = split_refferer('{{ referrer }}')
    document['bucket'].value = bucket
    document['iframe'].src ="{{ referrer }}"
-   document['media'].value = "{{ referrer }}"
+   if "mp3" in "{{ referrer }}":
+      document['media'].value = "{{ referrer }}"
+   else:
+      document['picture_link'].value = "{{ referrer }}"
 else:
    pass
 </script>
@@ -416,6 +411,12 @@ else:
 		      Media
 	      </td><td>
 		      <input id="media" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+		      Picture link
+	      </td><td>
+		      <input id="picture_link" class="variable">
 	      </td>
       </tr><tr>
 	      <td>
@@ -462,6 +463,14 @@ else:
       			<input id="mp3" name="FILE" type="file", class="variable">
 	      </td><td>
 			<input id="upload_mp3" type=submit value="Upload MP3" >
+       			</form>
+	      </td>
+      </tr><tr>
+	      <td>
+      			<form id="picture_uploader" action="https://notdb.martyni.co.uk/authmartynicouk/file/" method=post enctype=multipart/form-data>
+      			<input id="picture" name="FILE" type="file", class="variable">
+	      </td><td>
+			<input id="upload_picture" type=submit value="Upload picture" >
        			</form>
 	      </td>
       </tr>
