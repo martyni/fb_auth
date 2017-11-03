@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, Response, request, url_for, redirect, jsonify, render_template, session, make_response, request, current_app
 from secrets import FACEBOOK_APP_ID, FACEBOOK_APP_SECRET
 from feedgen.feed import FeedGenerator
@@ -147,14 +148,19 @@ def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
             description=description)
     counter = 1
     for i in episodes:
+       author = i.get("author") or "anonymous"
+       email = i.get("email") or "anonymous@anonymous.com"
+       title = str(i.get('title')).title() or "title"
+       contents = i.get("contents")[0].replace("`", "'").replace(u"¬", "'") or "contents"
        fe = fg.add_entry()
        fe.id(str(counter) + "mp3")
-       fe.title(i.get('title').title())
-       fe.description(i.get("contents")[0].replace("`", "'"))
+       fe.title(str(i.get('title')).title())
+       fe.description(contents)
        if i.get("media"):
           fe.enclosure(i.get("media"), 0, 'audio/mpeg')
        fe.link(href=request.url, rel='alternate')
-       fe.author(name=i.get("author"), email=i.get("email")) 
+       fe.author(name=author, email=email) 
+       counter += 1
     return Response(fg.rss_str(), mimetype='text/xml')
        
 
