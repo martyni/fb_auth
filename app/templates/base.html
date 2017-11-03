@@ -301,6 +301,7 @@ def get_each_element(url, key=None):
       if element.get("media"):
          article_header += html_elements["AUDIO"]("boop", src=element["media"],controls=True, type="audio/mpeg") 
       elif element.get("picture_link") and request_url[-1] != "/":
+         document.select('head')[0] <= html_elements["META"](content=element["picture_link"], property="og:image" )
 	 article_header += html_elements["IMG"](src=element["picture_link"],  style={"max-height":"250px"})
       body, scripts = element["contents"]
       body = body.replace(r"`", "'").replace("¬", "'").replace(r'\\n', '').replace(r"<p></p>","")

@@ -122,10 +122,12 @@ def rss_feed(feed="page", db="https://notdb.martyni.co.uk"):
             bucket=bucket,
             feed=feed
             )
+    print feed_url
     episodes_links = requests.get(feed_url).json()
-    episodes = [requests.get(db + link).json() for link in episodes_links]
-    description = str(episodes[0].get('description'))
-    author      = str(episodes[0].get('author'))
+    episodes = [requests.get(db + link).json()  for link in episodes_links]
+    print episodes 
+    description = str(episodes[-1].get('description'))
+    author      = str(episodes[-1].get('author'))
     title       = feed
     email       = "martynjamespratt@gmail.com"
     fg          = FeedGenerator()
