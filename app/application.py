@@ -197,7 +197,15 @@ def index():
     referrer = variables.get("referrer")
     user_name =  variables.get("user_name")
     admin = variables.get("admin")
-    return render_template("index.html", request=request, user_name=user_name, url_4=url_4, static_url=static_url, path=request.path, admin=admin, referrer=referrer)
+    return render_template("index.html", 
+            request=request, 
+            user_name=user_name, 
+            url_4=url_4, 
+            static_url=static_url, 
+            path=request.path, 
+            picture_link=None,
+            admin=admin, 
+            referrer=referrer)
 
 @app.route("/article/<article>")
 def article(article):
@@ -205,7 +213,17 @@ def article(article):
     referrer = variables.get("referrer")
     user_name =  variables.get("user_name")
     admin = variables.get("admin")
-    return render_template("article.html", request=request, user_name=user_name, url_4=url_4, static_url=static_url, path=request.path,admin=admin, referrer=referrer, article=article )
+    article_contents =  requests.get(db_url + "/authmartynicouk/thing/" + article).json()
+    return render_template("article.html",
+            request=request, 
+            user_name=user_name, 
+            url_4=url_4, 
+            static_url=static_url, 
+            path=request.path,
+            admin=admin, 
+            picture_link = article_contents.get("picture_link"),
+            referrer=referrer, 
+            article=article )
 
 
 @app.route("/style.css")
