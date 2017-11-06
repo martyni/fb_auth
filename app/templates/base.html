@@ -2,8 +2,12 @@
 <head>
 <script src="https://cdn.rawgit.com/brython-dev/brython/stable/www/src/brython_dist.js"></script>
 <link rel="stylesheet" type="text/css" href="https://notdb.martyni.co.uk/authmartynicouk/file/style.css">
-{% if picture_link %}
-<meta property="og:image" content="{{picture_link}}" />
+{% if article_contents %}
+<meta property="og:title" content="{{article_contents['title']}}" />
+<meta property="og:url" content="{{ path }}" />
+<meta property="og:type" content="article" />
+<meta property="og:description" content="{{article_contents['title']}}" />
+<meta property="og:image" content="{{article_contents['picture_link']}}" />
 {% else %}
 <meta property="og:image" content="https://notdb.martyni.co.uk/authmartynicouk/file/face.png" />
 {% endif %}

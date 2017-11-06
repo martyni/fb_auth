@@ -203,7 +203,7 @@ def index():
             url_4=url_4, 
             static_url=static_url, 
             path=request.path, 
-            picture_link=None,
+            article_contents=None,
             admin=admin, 
             referrer=referrer)
 
@@ -221,7 +221,7 @@ def article(article):
             static_url=static_url, 
             path=request.path,
             admin=admin, 
-            picture_link = article_contents.get("picture_link"),
+            article_contents = article_contents,
             referrer=referrer, 
             article=article )
 
