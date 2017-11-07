@@ -15,7 +15,7 @@
 </head>
 <body onload="brython()" >
 <script type="text/python">
-from browser import document, ajax, html, markdown
+from browser import document, ajax, html, markdown, svg
 from browser.local_storage import storage
 import json
 api_url = "https://notdb.martyni.co.uk"
@@ -166,6 +166,26 @@ except:
 
 def parse_time(datestring):
    return datetime.datetime.strptime(datestring, "%Y-%m-%d %H:%M:%S.%f")
+
+def logo(element, size):
+    polygon = svg.polygon(
+       fill="black",
+       points=" ".join(["0,0", "0,{}".format(size),  "{},{}".format(int(size/2), size)])
+       )
+    polygon2 = svg.polygon(
+       fill="white",
+       opacity=0.9,
+       points=" ".join(["0,0", "{},{}".format(size, 0),  "{},{}".format(int(size/2), size)])
+       )
+    polygon3 = svg.polygon(
+       fill="#4BC8FF",
+       points=" ".join(["{},{}".format(size, 0), "{},{}".format(size,size),  "{},{}".format(int(size/2), size)])
+       )
+    container = html_elements["SVG"](style={"height": size, "width": size})   
+    container <= polygon
+    container <= polygon2
+    container <= polygon3
+    document[element] <= container
 
 def get_variables():
     vars = document.get(selector='input.variable')
@@ -386,7 +406,13 @@ get_page()
 <nav >
      <ul id="navigation">	
         <li>
-           <a href="/">Home</a>
+           <a href="/" id="home">
+		   <svg style="height: 20px; width: 20px;">
+			   <polygon fill="black" points="0,0 0,20 10,20"></polygon>
+			   <polygon fill="white" opacity="0.9" points="0,0 20,0 10,20"></polygon>
+			   <polygon fill="#4BC8FF" points="20,0 20,20 10,20"></polygon></svg>
+		   </svg>
+	   </a>
         </li>
         {% if not session.logged_in %}
         <li>
