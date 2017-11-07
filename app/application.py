@@ -226,6 +226,10 @@ def article(article):
             article=article )
 
 
+@app.route("/favicon.ico")
+def redirect():
+    return redirect(db_url + "/authmartynicouk/file/favicon.ico", 301)
+
 @app.route("/style.css")
 def style():
     template = render_template("style.css", static_url=static_url)
