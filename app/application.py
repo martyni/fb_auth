@@ -227,7 +227,7 @@ def article(article):
 
 
 @app.route("/favicon.ico")
-def redirect():
+def redirection(*args, **kwargs):
     return redirect(db_url + "/authmartynicouk/file/favicon.ico", 301)
 
 @app.route("/style.css")
