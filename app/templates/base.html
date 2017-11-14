@@ -15,7 +15,7 @@
 </head>
 <body onload="brython()" >
 <div style="position: fixed; top: 75px; right: 30px;z-index: 100;">	
-<iframe src="https://www.facebook.com/plugins/like.php?href={{request.url}}&width=450&layout=standard&action=like&size=small&show_faces=true&share=true&height=80&appId=235782140173083" width="450" height="80" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+<iframe src="https://www.facebook.com/plugins/like.php?href={{encoded_url}}&width=450&layout=standard&action=like&size=small&show_faces=true&share=true&height=80&appId=235782140173083" width="450" height="80" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
 </div >	
 <script type="text/python">
 from browser import document, ajax, html, markdown, svg

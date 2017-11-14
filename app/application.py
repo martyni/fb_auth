@@ -190,6 +190,8 @@ def base_variables():
     print data
     return data
 
+def encode_url(url):
+    return url.replace(":", "%3A").replace("/", "%2F")
 
 @app.route("/")
 def index():
@@ -199,6 +201,7 @@ def index():
     admin = variables.get("admin")
     return render_template("index.html", 
             request=request, 
+            encoded_url=encode_url(request.url),
             user_name=user_name, 
             url_4=url_4, 
             static_url=static_url, 
@@ -216,6 +219,7 @@ def article(article):
     article_contents =  requests.get(db_url + "/authmartynicouk/thing/" + article).json()
     return render_template("article.html",
             request=request, 
+            encoded_url=encode_url(request.url),
             user_name=user_name, 
             url_4=url_4, 
             static_url=static_url, 
