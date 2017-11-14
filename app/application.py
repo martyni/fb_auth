@@ -219,7 +219,7 @@ def article(article):
     article_contents =  requests.get(db_url + "/authmartynicouk/thing/" + article).json()
     return render_template("article.html",
             request=request, 
-            encoded_url=encode_url(request.url),
+            encoded_url=encode_url(url_4(request.url)),
             user_name=user_name, 
             url_4=url_4, 
             static_url=static_url, 
