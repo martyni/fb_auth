@@ -390,8 +390,6 @@ get_page()
 {% endif %}
 </script>
 <div id="container" style="width:1000px;margin:auto;">
-   <div id="page">	
-   </div>
         {% if not session.logged_in %}
         {% elif session.logged_in and admin %}
         {% block admin %}
@@ -400,8 +398,9 @@ get_page()
         {% block content %}
         {% endblock%}
         {% endif%}
-   <div id="afterpage">
-   </div>	
+	<div id="page"></div>	
+        <div id="afterpage">
+        </div>	
 </div>
 <nav >
      <ul id="navigation">	
