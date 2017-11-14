@@ -355,7 +355,6 @@ document['put'].bind('click', put_item)
 document['get'].bind('click', get_item)
 document['delete'].bind('click', delete_item)
 document['key_value'].bind('click', add_key_value)
-document['html'].bind('click', add_key_value)
 document['upload'].bind('mouseenter', upload_file)
 document['contents'].bind('focus', add_box)
 document['contents'].bind('keydown', update_blog)
@@ -367,6 +366,7 @@ if '{{ referrer }}' != 'None':
    bucket,filename = split_refferer('{{ referrer }}')
    document['bucket'].value = bucket
    document['iframe'].src ="{{ referrer }}"
+   document['iframe'].style = {"height":"50%"}
    if "mp3" in "{{ referrer }}":
       document['media'].value = "{{ referrer }}"
    else:
@@ -379,33 +379,36 @@ else:
 </div>
 <div id="app">
    <container id="inputs">
-   <iframe id="iframe" width="100%" height="50%" frameborder="0"></iframe>
+   <iframe id="iframe" width="100%" frameborder="0"></iframe>
       <table>
-      <tr>
-	 <th>
-      		       Function
-	 </th><th>
-		       Value
-	 </th>   
-      </tr><tr>
-	 <td>
-      		       HTML
-	 </td><td>
-		 <input list="elements" id="html" class="variable" value="ARTICLE"> </input>
-            	       <datalist id="elements" ></datalist>
-	 </td>   
-      </tr><tr>
+      <tr class="advanced">
 	      <td>
-		       HTML contents
-	      </td><td>
-		       <textarea id="contents" type="text" class="variable"></textarea>
+		        Bucket
+		        <input id="bucket" class="variable">
 	      </td>
-      </tr><tr>
+	      <td>
+      			List
+			<input id="list" class="variable">
+	      </td>
+	      <td>
+      			Value
+			<input id="value" class="variable">
+	      </td>
+	      <td>
+		      Index
+		   	<input id="index" class="variable">
+	      </td>
       </tr><tr>
 	      <td>
 		        Title
 	      </td><td>
 		        <input id="title" class="variable">
+	      </td>
+      </tr><tr>
+	      <td>
+		       HTML contents
+	      </td><td>
+		       <textarea id="contents" type="text" class="variable"></textarea>
 	      </td>
       </tr><tr>
 	      <td>
@@ -426,29 +429,12 @@ else:
 		        <input id="tags" class="variable">
 	      </td>
       </tr><tr>
-	      <td>
-		        Bucket
-	      </td><td>
-		        <input id="bucket" class="variable">
-	      </td>
-      </tr><tr>
-	      <td>
-      			List
-	      </td><td>
-			<input id="list" class="variable">
-	      </td>
-      </tr><tr>
-	      <td>
-      			Value
-	      </td><td>
-			<input id="value" class="variable">
-	      </td>
-      </tr><tr>
-	      <td>
-		      Index
-	      </td><td>
-		   	<input id="index" class="variable">
-	      </td>
+	 <td>
+      		       HTML
+	 </td><td>
+		 <input list="elements" id="html" class="variable" value="ARTICLE"> </input>
+            	       <datalist id="elements" ></datalist>
+	 </td>   
       </tr><tr>
 	      <td>
       			<form id="file_uploader" action="/" method=post enctype=multipart/form-data>
@@ -457,7 +443,6 @@ else:
 			<input id="upload" type=submit value=Upload >
        			</form>
 	      </td>
-      </tr>
       </tr><tr>
 	      <td>
       			<form id="mp3_uploader" action="https://notdb.martyni.co.uk/authmartynicouk/file/" method=post enctype=multipart/form-data>
@@ -474,14 +459,17 @@ else:
 			<input id="upload_picture" type=submit value="Upload picture" >
        			</form>
 	      </td>
+      </tr><tr>
+	      <td>
+                 <button id="send_html">html</button>
+                 <button id="post" class="advanced">post</button>
+                 <button id="put" class="advanced">put</button>
+                 <button id="get" class="advanced">get</button>
+                 <button id="delete" class="advanced">delete</button>
+                 <button id="key_value" class="advanced">+</button>
+	      </td>
       </tr>
       </table>
-      <button id="send_html">html</button>
-      <button id="post">post</button>
-      <button id="put">put</button>
-      <button id="get">get</button>
-      <button id="delete">delete</button>
-      <button id="key_value">+</button>
    </container>
    <br/>
 </div>
