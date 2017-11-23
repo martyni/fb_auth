@@ -341,7 +341,7 @@ def get_each_element(url, key=None):
       article = html_elements[element["type"]](article_header + article_body , id="article_{}".format(key))
       if key:
          article.className = "front_page"
-         document[key] <= article
+         document[key] <= html_elements["A"](article, href=link)
       else:
          document["page"] <= article
       for s in scripts:
