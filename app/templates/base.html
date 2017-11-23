@@ -8,7 +8,7 @@
 <meta property="og:url" content="{{ path }}" />
 <meta property="og:type" content="article" />
 <meta property="og:description" content="{{article_contents['title']}}" />
-<meta property="og:image" content="{{article_contents['picture_link']}}" />
+<meta property="og:image" content="{{article_contents['picture_link'] or 'https://notdb.martyni.co.uk/authmartynicouk/file/martyni.png' }}" />
 {% else %}
 <meta property="og:image" content="https://notdb.martyni.co.uk/authmartynicouk/file/martyni.png" />
 {% endif %}
