@@ -318,7 +318,6 @@ def handle_time(a_datetime):
 
 def get_each_element(url, key=None):
    def each_element(req, text=None, key=key):
-      document["loading"].style = {"display": None}
       if text:
          element = json.loads(text)
       else:
@@ -348,6 +347,7 @@ def get_each_element(url, key=None):
       for s in scripts:
          exec(script, globals())
       handle_footer(element, "article_{}".format(key))
+      document["loading"].style = {"display": None}
       
    base_request(api_url + url, each_element, each_element)
 
