@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block admin %}
 <script type="text/python">
-from browser import document, alert, ajax, html, console, markdown
+from browser import document,timer, alert, ajax, html, console, markdown
 import datetime
 import json
 import re
+import time
 api_url = 'https://notdb.martyni.co.uk'
 box_added = False
-
-
+globals_ = {"key_presses": 0}
 html_elements = {
 "BLOCKQUOTE":html.BLOCKQUOTE,
 "OBJECT":html.OBJECT,
@@ -327,26 +327,32 @@ def cut_down_spaces(contents):
    return contents
 
 def update_blog():
-   vars = get_variables()
-   raw_markdown, scripts = create_markdown(vars['contents'])
-   article = cut_down_spaces(raw_markdown)
-   document['edit'].html = article
-   for script in scripts:
-       exc(script, globals())
-   return article, scripts    
+   current_presses = globals_.get("key_presses") + 1
+   globals_["key_presses"] = current_presses
+   if not globals_.get("blocked"):
+      vars = get_variables()
+      raw_markdown, scripts = create_markdown(vars['contents'])
+      article = cut_down_spaces(raw_markdown)
+      document['edit'].html = article
+      for script in scripts:
+          exc(script, globals())
+      timer.set_timeout(unblock, 3000)
+      globals_["blocked"] = True 
+      return article, scripts    
+
+def unblock():
+   print("unblocked")
+   globals_["blocked"] = False
+   update_blog() 
 
 def toggle_visibility():
    if document['app'].style is {}:
       print(document['app'].style)
-      print('None')
       document['app'].style = {'display' : 'none'} 
    elif document['app'].style.display == 'none':
       document['app'].style = {'display' : 'inline' }
-      print('inline')
    else:
-      print(document['app'].style.display)
       document['app'].style = {'display' : 'none'} 
-      print('None')
 
 add_send_types()
 document['send_html'].bind('click', send_html)
@@ -358,7 +364,6 @@ document['key_value'].bind('click', add_key_value)
 document['upload'].bind('mouseenter', upload_file)
 document['contents'].bind('focus', add_box)
 document['contents'].bind('keydown', update_blog)
-document['contents'].bind('keyup', update_blog)
 document['display'].bind('click', toggle_visibility)
 
 #alert("{{ referrer }}")
