@@ -242,14 +242,19 @@ def create_markdown(raw_text):
 def send_html():
    vars = get_variables()
    bucket = "authmartynicouk"
-   alist = "page"
+   if vars.get("list"):
+      alist = vars.get("list")
+   else:
+      alist = "page"
    url = api_url + '/' + bucket + '/list/' + alist
    date_ = str(datetime.datetime.utcnow())
+   globals_["blocked"] = False
    md, scripts= update_blog()
    md = md.replace('"', '¬').replace("'", "¬")
-   if not vars["tags"]:
+   if not vars.get("tags"):
       tags = []
    else:
+      print("trying this")
       tags = vars["tags"].split(",")
    data = {
       "type": vars["html"] ,
@@ -269,7 +274,6 @@ def send_html():
       base_request('POST',url +"?tags={}".format(vars["tags"]), True, data=data)
    else:
       base_request('POST',url, True, data=data)
-
 
 
 def add_send_types():
