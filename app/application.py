@@ -216,7 +216,10 @@ def article(article):
     referrer = variables.get("referrer")
     user_name =  variables.get("user_name")
     admin = variables.get("admin")
-    article_contents =  requests.get(db_url + "/authmartynicouk/thing/" + article).json()
+    try:
+       article_contents =  requests.get(db_url + "/authmartynicouk/thing/" + article).json()
+    except:
+       article_contents ={} 
     return render_template("article.html",
             request=request, 
             encoded_url=encode_url(url_sanitizer(request.url)),
