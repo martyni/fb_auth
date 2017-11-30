@@ -26,7 +26,8 @@
           "environment_variables": {
                   "env": "prod",
 		  "static_host": "https://s3.eu-west-2.amazonaws.com",
-		  "static_path": "/martyni-static/auth/prod/app"
+		  "static_path": "/martyni-static/auth/prod/app",
+		  "FLASK_DEBUG": 1
           }		  
    }
 }
