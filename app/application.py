@@ -219,6 +219,7 @@ def article(article):
     try:
        article_contents =  requests.get(db_url + "/authmartynicouk/thing/" + article).json()
     except:
+       a = requests.get("https://google.com")
        article_contents ={} 
     return render_template("article.html",
             request=request, 
